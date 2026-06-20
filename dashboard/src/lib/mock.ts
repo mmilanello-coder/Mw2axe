@@ -119,14 +119,11 @@ export function mockAccounts(slug: string): AccountHealth[] {
     const roll = rng();
     const status = roll > 0.9 ? -2 : roll > 0.82 ? 2 : 1;
     const warmupScore = Math.floor(70 + rng() * 30) - (status < 0 ? 25 : 0);
-    const bounceRate = status < 0 ? 0.04 + rng() * 0.05 : rng() * 0.02;
     const dailyLimit = 30 + Math.floor(rng() * 30);
-    const sentToday = Math.floor(dailyLimit * (0.4 + rng() * 0.6));
-    const statusPenalty = status < 0 ? 40 : status === 2 ? 15 : 0;
-    const bouncePenalty = Math.min(40, bounceRate * 100 * 4);
+    const statusPenalty = status < 0 ? 45 : status === 2 ? 15 : 0;
     const healthScore = Math.max(
       0,
-      Math.min(100, Math.round(40 + warmupScore * 0.6 - statusPenalty - bouncePenalty))
+      Math.min(100, Math.round(35 + warmupScore * 0.65 - statusPenalty))
     );
     out.push({
       email,
@@ -136,8 +133,6 @@ export function mockAccounts(slug: string): AccountHealth[] {
       warmupStatus: status === 1 ? 1 : 0,
       warmupScore,
       dailyLimit,
-      sentToday,
-      bounceRate,
       healthScore,
       provider,
     });

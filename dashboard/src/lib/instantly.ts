@@ -153,16 +153,14 @@ function normAccount(raw: RawAccount): AccountHealth {
   const email = str(raw.email);
   const status = num(raw.status);
   const warmupScore = num(raw.stat_warmup_score ?? raw.warmup_score);
-  const bounceRate = num(raw.bounce_rate);
-  const sentToday = num(raw.sent_today ?? raw.emails_sent);
   const dailyLimit = num(raw.daily_limit ?? raw.warmup_limit) || 0;
-  // Derive a single 0-100 health score from the strongest signals available.
-  const statusPenalty = status < 0 ? 40 : status === 2 ? 15 : 0;
-  const bouncePenalty = Math.min(40, bounceRate * 100 * 4);
-  const warmupComponent = warmupScore * 0.6;
+  // Instantly's /accounts endpoint does not expose a per-account bounce rate, so
+  // we derive a 0-100 health score from warmup score + account status, which are
+  // the strongest signals available there.
+  const statusPenalty = status < 0 ? 45 : status === 2 ? 15 : 0;
   const healthScore = Math.max(
     0,
-    Math.min(100, Math.round(40 + warmupComponent - statusPenalty - bouncePenalty))
+    Math.min(100, Math.round(35 + warmupScore * 0.65 - statusPenalty))
   );
   return {
     email,
@@ -171,8 +169,6 @@ function normAccount(raw: RawAccount): AccountHealth {
     warmupStatus: num(raw.warmup_status),
     warmupScore,
     dailyLimit,
-    sentToday,
-    bounceRate,
     healthScore,
     provider: providerFromEmail(email),
   };

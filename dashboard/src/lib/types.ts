@@ -46,10 +46,8 @@ export type AccountHealth = {
   status: number; // 1 active, 2 paused, -1/-2/-3 error states
   statusLabel: string;
   warmupStatus: number; // 1 active
-  warmupScore: number; // 0-100
+  warmupScore: number; // 0-100 (Instantly stat_warmup_score)
   dailyLimit: number;
-  sentToday: number;
-  bounceRate: number; // 0-1
   healthScore: number; // 0-100 derived
   provider: string;
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import type { DashboardSnapshot } from "@/lib/types";
-import { fmtInt, fmtPct } from "@/lib/format";
+import { fmtInt } from "@/lib/format";
 import { FeedbackButton } from "./FeedbackButton";
 
 function healthColor(score: number): string {
@@ -69,8 +69,7 @@ export function DeliverabilityTab({
                 <th className="px-5 py-3 font-medium">Provider</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Warmup</th>
-                <th className="px-5 py-3 text-right font-medium">Bounce</th>
-                <th className="px-5 py-3 text-right font-medium">Today</th>
+                <th className="px-5 py-3 text-right font-medium">Daily cap</th>
                 <th className="px-5 py-3 font-medium">Health</th>
               </tr>
             </thead>
@@ -87,14 +86,8 @@ export function DeliverabilityTab({
                     </span>
                   </td>
                   <td className="px-5 py-3 tabular-nums">{a.warmupScore}</td>
-                  <td
-                    className="px-5 py-3 text-right tabular-nums"
-                    style={{ color: a.bounceRate > 0.03 ? "var(--bad)" : undefined }}
-                  >
-                    {fmtPct(a.bounceRate)}
-                  </td>
                   <td className="px-5 py-3 text-right tabular-nums muted">
-                    {fmtInt(a.sentToday)}/{fmtInt(a.dailyLimit)}
+                    {fmtInt(a.dailyLimit)}/day
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
