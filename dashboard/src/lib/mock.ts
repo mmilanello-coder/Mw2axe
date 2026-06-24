@@ -11,6 +11,7 @@ import type {
   AccountHealth,
   CampaignAnalytics,
   DailyPoint,
+  Lead,
 } from "./types";
 
 function makeRng(seedStr: string) {
@@ -101,6 +102,50 @@ export function mockDaily(slug: string, days: number): DailyPoint[] {
     last.sent += Math.floor(live() * 40);
     last.opens += Math.floor(live() * 15);
     last.replies += Math.floor(live() * 3);
+  }
+  return out;
+}
+
+const FIRST = ["Luca", "Marco", "Sara", "Giulia", "Andrea", "Chiara", "Matteo", "Elena", "Davide", "Francesca", "Paolo", "Marta", "Stefano", "Anna", "Roberto", "Laura"];
+const LAST = ["Rossi", "Bianchi", "Lando", "Ferrari", "Esposito", "Romano", "Greco", "Conti", "Bruno", "Gallo", "Costa", "Rizzo", "Moretti", "Barbieri", "Fontana", "Marino"];
+const COMP = ["Comunello Group", "Geriko SRL", "Nordtech", "Vela Digital", "Acme Foods", "Brera Studio", "Metodo Lab", "Polaris SpA", "Quadra", "Sintesi", "Vivace Retail", "Orizzonte"];
+const ROLES = ["CEO", "Founder", "Head of Sales", "Marketing Manager", "CTO", "Operations Lead", "Procurement", "Owner", "Growth Lead", "COO"];
+
+export function mockLeads(slug: string, campaigns: { id: string; name: string }[]): Lead[] {
+  const rng = makeRng(slug + ":leads");
+  const count = 60 + Math.floor(rng() * 40);
+  const out: Lead[] = [];
+  for (let i = 0; i < count; i++) {
+    const fn = FIRST[Math.floor(rng() * FIRST.length)];
+    const ln = LAST[Math.floor(rng() * LAST.length)];
+    const comp = COMP[Math.floor(rng() * COMP.length)];
+    const domain = comp.toLowerCase().replace(/[^a-z]/g, "").slice(0, 10) + ".com";
+    // Engagement: most leads do little, a tail engages a lot.
+    const r = rng();
+    const opens = r > 0.45 ? Math.floor(rng() * 6) : 0;
+    const clicks = opens && rng() > 0.55 ? Math.floor(rng() * 3) + 1 : 0;
+    const replies = clicks && rng() > 0.6 ? 1 : opens && rng() > 0.9 ? 1 : 0;
+    const status = replies ? 2 : r > 0.85 ? 3 : 1;
+    const camp = campaigns[Math.floor(rng() * campaigns.length)] || { id: "", name: "" };
+    const daysAgo = Math.floor(rng() * 30);
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    out.push({
+      id: `lead-${slug}-${i}`,
+      email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`,
+      firstName: fn,
+      lastName: ln,
+      company: comp,
+      jobTitle: ROLES[Math.floor(rng() * ROLES.length)],
+      website: "https://" + domain,
+      opens,
+      clicks,
+      replies,
+      status,
+      statusLabel: status === 1 ? "Active" : status === 2 ? "Completed" : "Unsubscribed",
+      campaignId: camp.id,
+      lastContact: d.toISOString(),
+    });
   }
   return out;
 }

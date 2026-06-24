@@ -5,15 +5,17 @@ import { useSnapshot } from "./hooks";
 import { OverviewTab } from "./OverviewTab";
 import { CampaignsTab } from "./CampaignsTab";
 import { DeliverabilityTab } from "./DeliverabilityTab";
+import { ContactsTab } from "./ContactsTab";
 import { FeedbackTab } from "./FeedbackTab";
 import { ReportTab } from "./ReportTab";
 import { fmtDateTime } from "@/lib/format";
 
-type Tab = "overview" | "campaigns" | "deliverability" | "feedback" | "report";
+type Tab = "overview" | "campaigns" | "contacts" | "deliverability" | "feedback" | "report";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "campaigns", label: "Campaigns" },
+  { id: "contacts", label: "Contatti" },
   { id: "deliverability", label: "Deliverability" },
   { id: "feedback", label: "Feedback" },
   { id: "report", label: "Report" },
@@ -110,6 +112,7 @@ export function Shell({ slug }: { slug: string }) {
         <div className={isLoading ? "opacity-70 transition" : "transition"}>
           {tab === "overview" && <OverviewTab snap={snapshot} slug={slug} />}
           {tab === "campaigns" && <CampaignsTab snap={snapshot} slug={slug} />}
+          {tab === "contacts" && <ContactsTab snap={snapshot} slug={slug} />}
           {tab === "deliverability" && <DeliverabilityTab snap={snapshot} slug={slug} />}
           {tab === "feedback" && <FeedbackTab slug={slug} />}
           {tab === "report" && <ReportTab snap={snapshot} slug={slug} />}

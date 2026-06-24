@@ -32,6 +32,33 @@ export function useFeedback(slug: string) {
   return { items: data?.items ?? [], refresh: mutate, isLoading };
 }
 
+import type { Lead } from "@/lib/types";
+
+export type LeadsResponse = {
+  source: "instantly" | "mock";
+  total: number;
+  shown: number;
+  engaged: { opened: number; clicked: number; replied: number };
+  leads: Lead[];
+};
+
+export function useLeads(
+  slug: string,
+  opts: { filter: string; campaign: string; q: string }
+) {
+  const params = new URLSearchParams({
+    filter: opts.filter,
+    campaign: opts.campaign,
+    q: opts.q,
+  });
+  const { data, isLoading, error } = useSWR<LeadsResponse>(
+    `/api/c/${slug}/leads?${params.toString()}`,
+    fetcher,
+    { refreshInterval: 60_000, keepPreviousData: true }
+  );
+  return { data, isLoading, error };
+}
+
 export async function postFeedback(
   slug: string,
   payload: {

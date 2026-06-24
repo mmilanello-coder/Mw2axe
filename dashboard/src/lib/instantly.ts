@@ -192,4 +192,81 @@ export async function fetchAccounts(apiKey: string): Promise<AccountHealth[]> {
   return out.filter((a) => a.email);
 }
 
+// ── Leads (per-contact engagement) ───────────────────────────────────────────
+
+function leadStatusLabel(status: number): string {
+  switch (status) {
+    case 1:
+      return "Active";
+    case 2:
+      return "Completed";
+    case 3:
+      return "Unsubscribed";
+    case -1:
+      return "Bounced";
+    case -2:
+      return "Stopped";
+    default:
+      return "—";
+  }
+}
+
+type RawLead = Record<string, unknown>;
+
+function normLead(raw: RawLead): import("./types").Lead {
+  const email = str(raw.email);
+  const status = num(raw.status);
+  const lc = raw.timestamp_last_contact;
+  return {
+    id: str(raw.id, email),
+    email,
+    firstName: str(raw.first_name),
+    lastName: str(raw.last_name),
+    company: str(raw.company_name),
+    jobTitle: str(raw.job_title),
+    website: str(raw.website),
+    opens: num(raw.email_open_count),
+    clicks: num(raw.email_click_count),
+    replies: num(raw.email_reply_count),
+    status,
+    statusLabel: leadStatusLabel(status),
+    campaignId: str(raw.campaign),
+    lastContact: typeof lc === "string" ? lc : null,
+  };
+}
+
+/**
+ * POST /leads/list — walk pages up to `maxLeads` and return normalised leads.
+ * `campaignId` optionally scopes to one campaign.
+ */
+export async function fetchLeads(
+  apiKey: string,
+  opts: { maxLeads?: number; campaignId?: string } = {}
+): Promise<import("./types").Lead[]> {
+  const maxLeads = opts.maxLeads ?? 1000;
+  const out: import("./types").Lead[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < Math.ceil(maxLeads / 100); page++) {
+    const body: Record<string, unknown> = { limit: 100 };
+    if (cursor) body.starting_after = cursor;
+    if (opts.campaignId) body.campaign = opts.campaignId;
+    const res = await fetch(BASE_URL + "/leads/list", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new InstantlyError(`Instantly /leads/list → ${res.status} ${text.slice(0, 200)}`, res.status);
+    }
+    const data = (await res.json()) as { items?: RawLead[]; next_starting_after?: string };
+    const items = data.items ?? [];
+    out.push(...items.map(normLead));
+    if (!data.next_starting_after || items.length === 0 || out.length >= maxLeads) break;
+    cursor = data.next_starting_after;
+  }
+  return out.filter((l) => l.email);
+}
+
 export { InstantlyError };

@@ -82,6 +82,7 @@
   <nav class="tabs" id="tabs">
     <button class="on" data-t="overview">Overview</button>
     <button data-t="campaigns">Campaigns</button>
+    <button data-t="contacts">Contatti</button>
     <button data-t="deliverability">Deliverability</button>
     <button data-t="feedback">Feedback</button>
     <button data-t="report">Report</button>
@@ -89,6 +90,7 @@
 
   <section id="overview"></section>
   <section id="campaigns" class="hide"></section>
+  <section id="contacts" class="hide"></section>
   <section id="deliverability" class="hide"></section>
   <section id="feedback" class="hide"></section>
   <section id="report" class="hide"></section>
@@ -258,8 +260,55 @@ document.getElementById("report").innerHTML=`
     <div class="tiny muted" style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px">Generato ora · Fonte: Instantly (live)</div>
   </div>`;
 
+// ---- contatti / engagement ----
+const FN=["Luca","Marco","Sara","Giulia","Andrea","Chiara","Matteo","Elena","Davide","Roberto","Paolo","Marta"];
+const LN=["Rossi","Bianchi","Valle","Ferrari","Sordi","Romano","Greco","Conti","Bruno","Gallo","Costa","Rizzo"];
+const CO=["Stone Italiana","Italsinergie","Comunello Group","Nordtech","Vela Digital","Acme Foods","Brera Studio","Metodo Lab","Polaris SpA","Quadra"];
+const RL=["CEO","Founder","Head of Sales","Marketing Mgr","CTO","Owner","Procurement","COO"];
+const leads=Array.from({length:80},(_,i)=>{
+  const fn=FN[Math.floor(rnd()*FN.length)],ln=LN[Math.floor(rnd()*LN.length)],co=CO[Math.floor(rnd()*CO.length)];
+  const dom=co.toLowerCase().replace(/[^a-z]/g,"").slice(0,9)+".it";
+  const r=rnd();const opens=r>0.45?Math.floor(rnd()*8):0;
+  const clicks=opens&&rnd()>0.55?Math.floor(rnd()*3)+1:0;
+  const replies=clicks&&rnd()>0.6?1:(opens&&rnd()>0.9?1:0);
+  const camp=camps[Math.floor(rnd()*camps.length)].name;
+  return{fn,ln,co,role:RL[Math.floor(rnd()*RL.length)],email:fn.toLowerCase()+"."+ln.toLowerCase()+"@"+dom,opens,clicks,replies,camp,last:Math.floor(rnd()*28)+1};
+});
+const eng={opened:leads.filter(l=>l.opens>0).length,clicked:leads.filter(l=>l.clicks>0).length,replied:leads.filter(l=>l.replies>0).length};
+let cFilter="clicked";
+function renderContacts(){
+  const f=cFilter;
+  let rows=leads.filter(l=> f==="opened"?l.opens>0 : f==="clicked"?l.clicks>0 : f==="replied"?l.replies>0 : true);
+  rows=rows.sort((a,b)=>b.clicks-a.clicks||b.replies-a.replies||b.opens-a.opens);
+  const pill=(id,lab)=>`<button onclick="cFilter='${id}';renderContacts()" style="padding:6px 12px;font-size:13px;border:0;cursor:pointer;background:${f===id?'var(--accent)':'transparent'};color:${f===id?'var(--accent-ink)':'var(--muted)'};font-weight:${f===id?600:400}">${lab}</button>`;
+  document.getElementById("contacts").innerHTML=`
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px;max-width:560px">
+      <div class="card kpi"><div class="lab">Hanno aperto</div><div class="val" style="color:#1f9d7a">${eng.opened}</div></div>
+      <div class="card kpi"><div class="lab">Hanno cliccato</div><div class="val" style="color:#244f4f">${eng.clicked}</div></div>
+      <div class="card kpi"><div class="lab">Hanno risposto</div><div class="val" style="color:#c08a1e">${eng.replied}</div></div>
+    </div>
+    <div class="card" style="display:flex;gap:10px;align-items:center;padding:10px;margin-top:14px;flex-wrap:wrap">
+      <div style="display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden">${pill("all","Tutti")}${pill("opened","Hanno aperto")}${pill("clicked","Hanno cliccato")}${pill("replied","Hanno risposto")}</div>
+      <input placeholder="Cerca nome, azienda o email…" style="flex:1;min-width:200px;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:14px;color:var(--text)"/>
+      <button class="btn">💬 Comment</button>
+    </div>
+    <div class="card" style="overflow:hidden;margin-top:14px">
+      <div style="padding:11px 16px;border-bottom:1px solid var(--border)" class="tiny muted">${rows.length} contatti</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Contatto</th><th>Azienda</th><th>Campagna</th><th class="r">Aperture</th><th class="r">Click</th><th class="r">Reply</th><th class="r">Ultimo</th></tr></thead><tbody>
+      ${rows.map(l=>`<tr>
+        <td><div style="font-weight:500;color:var(--ink)">${l.fn} ${l.ln} <span class="muted" style="font-weight:400">· ${l.role}</span></div><div class="tiny muted">${l.email}</div></td>
+        <td>${l.co}</td><td class="muted">${l.camp}</td>
+        <td class="r">${l.opens}</td>
+        <td class="r" style="color:${l.clicks>0?'var(--accent-strong)':''};font-weight:${l.clicks>0?600:400}">${l.clicks}</td>
+        <td class="r" style="color:${l.replies>0?'var(--good)':''};font-weight:${l.replies>0?600:400}">${l.replies}</td>
+        <td class="r muted">${l.last}g fa</td></tr>`).join("")}
+      </tbody></table></div>
+    </div>`;
+}
+renderContacts();
+
 // ---- tabs ----
-const secs=["overview","campaigns","deliverability","feedback","report"];
+const secs=["overview","campaigns","contacts","deliverability","feedback","report"];
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));
   b.classList.add("on");

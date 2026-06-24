@@ -52,6 +52,24 @@ export type AccountHealth = {
   provider: string;
 };
 
+/** A single contact/lead with per-person engagement (opens/clicks/replies). */
+export type Lead = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  jobTitle: string;
+  website: string;
+  opens: number;
+  clicks: number;
+  replies: number;
+  status: number;
+  statusLabel: string;
+  campaignId: string;
+  lastContact: string | null;
+};
+
 export type FeedbackItem = {
   id: string;
   clientSlug: string;
