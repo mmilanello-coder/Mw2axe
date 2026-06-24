@@ -59,7 +59,7 @@ export function Shell({ slug }: { slug: string }) {
                 key={r.days}
                 onClick={() => setDays(r.days)}
                 className={`px-3 py-1.5 text-sm ${
-                  days === r.days ? "accent-bg text-white" : "muted hover:text-[var(--text)]"
+                  days === r.days ? "accent-bg" : "muted hover:text-[var(--text)]"
                 }`}
               >
                 {r.label}
@@ -99,7 +99,7 @@ export function Shell({ slug }: { slug: string }) {
           <div className="text-[var(--bad)]">Could not load dashboard data.</div>
           <button
             onClick={() => refresh()}
-            className="mt-3 rounded-lg accent-bg px-4 py-2 text-sm font-medium text-white"
+            className="mt-3 rounded-lg accent-bg px-4 py-2 text-sm font-medium"
           >
             Retry
           </button>

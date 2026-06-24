@@ -107,12 +107,12 @@ function Td({
 
 function StatusPill({ status }: { status: number }) {
   const map: Record<number, string> = {
-    0: "#8a92a6",
-    1: "#34d399",
-    2: "#fbbf24",
-    3: "#60a5fa",
+    0: "#6e8b8b",
+    1: "#1f9d7a",
+    2: "#c08a1e",
+    3: "#2f7da8",
   };
-  const color = map[status] ?? "#8a92a6";
+  const color = map[status] ?? "#6e8b8b";
   return (
     <span className="mt-1 inline-flex items-center gap-1.5 text-xs muted">
       <span className="inline-block h-2 w-2 rounded-full" style={{ background: color }} />

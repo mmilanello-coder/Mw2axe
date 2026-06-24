@@ -1,17 +1,24 @@
 @import "tailwindcss";
 
-/* Design tokens. Accent is overridden per-client via the inline --accent var. */
+/* ── Axend brand identity (light theme) ──────────────────────────────────────
+   accent  #AAD8D8  · text/blocks #244F4F · titles #022226 · bg #FFFFFF
+   Accent is light, so it's used as a surface fill with dark ink text; a
+   stronger teal (--accent-strong) carries charts, bars and active borders.
+   --accent is overridden per-client via the inline --accent var in layout.   */
 :root {
-  --accent: #6366f1;
-  --bg: #0b0d12;
-  --panel: #12151c;
-  --panel-2: #171b24;
-  --border: #232936;
-  --text: #e6e9ef;
-  --muted: #8a92a6;
-  --good: #34d399;
-  --warn: #fbbf24;
-  --bad: #f87171;
+  --accent: #aad8d8;          /* primary brand accent (light teal) */
+  --accent-strong: #244f4f;   /* strong interactive teal: charts, bars, CTAs */
+  --accent-ink: #022226;      /* readable text/icons on accent surfaces */
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f2f8f8;
+  --border: #dce8e8;
+  --text: #244f4f;
+  --ink: #022226;
+  --muted: #6e8b8b;
+  --good: #1f9d7a;
+  --warn: #c08a1e;
+  --bad: #d2453e;
 }
 
 html,
@@ -26,11 +33,13 @@ body {
     Arial, sans-serif;
 }
 
-/* Utility shorthands layered on Tailwind. */
+h1, h2 { color: var(--ink); }
+
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(2, 34, 38, 0.04), 0 1px 3px rgba(2, 34, 38, 0.05);
 }
 .card-2 {
   background: var(--panel-2);
@@ -41,15 +50,16 @@ body {
   color: var(--muted);
 }
 .accent {
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 .accent-bg {
   background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .tab-active {
-  color: var(--text);
-  border-color: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent-strong);
 }
 
 .pulse-dot {
@@ -57,18 +67,18 @@ body {
   height: 8px;
   border-radius: 9999px;
   background: var(--good);
-  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 0 0 rgba(31, 157, 122, 0.7);
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+    box-shadow: 0 0 0 0 rgba(31, 157, 122, 0.55);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+    box-shadow: 0 0 0 8px rgba(31, 157, 122, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+    box-shadow: 0 0 0 0 rgba(31, 157, 122, 0);
   }
 }
 
@@ -77,15 +87,10 @@ body {
   .no-print {
     display: none !important;
   }
-  html,
-  body {
-    background: #fff;
-    color: #111;
-  }
   .card,
   .card-2 {
-    background: #fff;
-    border-color: #ddd;
+    box-shadow: none;
+    border-color: #d9e4e4;
     break-inside: avoid;
   }
   .print-block {

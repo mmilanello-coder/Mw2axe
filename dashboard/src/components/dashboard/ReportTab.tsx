@@ -29,7 +29,7 @@ export function ReportTab({ snap, slug }: { snap: DashboardSnapshot; slug: strin
           </a>
           <button
             onClick={() => window.print()}
-            className="rounded-lg accent-bg px-3 py-1.5 text-sm font-medium text-white"
+            className="rounded-lg accent-bg px-3 py-1.5 text-sm font-medium"
           >
             🖨 Save as PDF
           </button>

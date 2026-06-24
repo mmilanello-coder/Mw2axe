@@ -73,7 +73,7 @@ export function FeedbackButton({
                 onClick={() => setKind(k)}
                 className={`rounded-md px-2 py-1 text-xs capitalize ${
                   kind === k
-                    ? "accent-bg text-white"
+                    ? "accent-bg"
                     : "card-2 muted hover:text-[var(--text)]"
                 }`}
               >
@@ -104,7 +104,7 @@ export function FeedbackButton({
             <button
               onClick={submit}
               disabled={sending || !body.trim()}
-              className="rounded-lg accent-bg px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded-lg accent-bg px-3 py-1.5 text-sm font-medium disabled:opacity-50"
             >
               {done ? "Sent ✓" : sending ? "Sending…" : "Send"}
             </button>

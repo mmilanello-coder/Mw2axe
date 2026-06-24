@@ -15,7 +15,7 @@ export default async function ClientLayout({
   const client = await getClient(slug);
   if (!client) notFound();
 
-  const style = { "--accent": client.accentColor ?? "#6366f1" } as CSSProperties;
+  const style = { "--accent": client.accentColor ?? "#aad8d8" } as CSSProperties;
 
   return (
     <div style={style} className="min-h-screen">

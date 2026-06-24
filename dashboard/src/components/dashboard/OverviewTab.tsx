@@ -51,15 +51,15 @@ export function OverviewTab({ snap, slug }: { snap: DashboardSnapshot; slug: str
           <TrendChart
             data={snap.daily}
             series={[
-              { key: "sent", label: "Sent", color: "var(--accent)" },
-              { key: "opens", label: "Opens", color: "#34d399" },
-              { key: "replies", label: "Replies", color: "#fbbf24" },
+              { key: "sent", label: "Sent", color: "#244f4f" },
+              { key: "opens", label: "Opens", color: "#1f9d7a" },
+              { key: "replies", label: "Replies", color: "#c08a1e" },
             ]}
           />
           <div className="mt-3 flex gap-4 text-xs muted">
-            <Legend color="var(--accent)" label="Sent" />
-            <Legend color="#34d399" label="Opens" />
-            <Legend color="#fbbf24" label="Replies" />
+            <Legend color="#244f4f" label="Sent" />
+            <Legend color="#1f9d7a" label="Opens" />
+            <Legend color="#c08a1e" label="Replies" />
           </div>
         </div>
 
@@ -70,8 +70,8 @@ export function OverviewTab({ snap, slug }: { snap: DashboardSnapshot; slug: str
             from {fmtInt(t.opportunities)} opportunities
           </div>
           <div className="mt-5 flex justify-around">
-            <Donut value={t.openRate} label="Open rate" color="#34d399" />
-            <Donut value={t.replyRate} label="Reply rate" color="var(--accent)" />
+            <Donut value={t.openRate} label="Open rate" color="#1f9d7a" />
+            <Donut value={t.replyRate} label="Reply rate" color="#244f4f" />
           </div>
         </div>
       </div>

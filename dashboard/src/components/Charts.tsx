@@ -61,10 +61,10 @@ export function TrendChart({
               x2={w - padR}
               y1={gy}
               y2={gy}
-              stroke="#232936"
+              stroke="#e3eded"
               strokeWidth={1}
             />
-            <text x={8} y={gy + 4} fill="#8a92a6" fontSize={10}>
+            <text x={8} y={gy + 4} fill="#6e8b8b" fontSize={10}>
               {val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val}
             </text>
           </g>
@@ -87,7 +87,7 @@ export function TrendChart({
 
       {data.map((d, i) =>
         i % Math.ceil(data.length / 6) === 0 || i === data.length - 1 ? (
-          <text key={i} x={x(i)} y={h - 8} fill="#8a92a6" fontSize={10} textAnchor="middle">
+          <text key={i} x={x(i)} y={h - 8} fill="#6e8b8b" fontSize={10} textAnchor="middle">
             {d.date.slice(5)}
           </text>
         ) : null
@@ -99,7 +99,7 @@ export function TrendChart({
 /** Horizontal bar comparison (e.g. campaigns by emails sent). */
 export function BarRows({
   rows,
-  color = "var(--accent)",
+  color = "#244f4f",
 }: {
   rows: { label: string; value: number; sub?: string }[];
   color?: string;
@@ -129,7 +129,7 @@ export function BarRows({
 export function Donut({
   value,
   label,
-  color = "var(--accent)",
+  color = "#244f4f",
   size = 120,
 }: {
   value: number;
@@ -148,7 +148,7 @@ export function Donut({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="#232936"
+          stroke="#e3eded"
           strokeWidth={10}
         />
         <circle
@@ -166,13 +166,13 @@ export function Donut({
           x="50%"
           y="48%"
           textAnchor="middle"
-          fill="var(--text)"
+          fill="#022226"
           fontSize={20}
           fontWeight={700}
         >
           {(pct * 100).toFixed(1)}%
         </text>
-        <text x="50%" y="64%" textAnchor="middle" fill="#8a92a6" fontSize={10}>
+        <text x="50%" y="64%" textAnchor="middle" fill="#6e8b8b" fontSize={10}>
           {label}
         </text>
       </svg>
@@ -183,7 +183,7 @@ export function Donut({
 /** Tiny inline sparkline. */
 export function Sparkline({
   values,
-  color = "var(--accent)",
+  color = "#244f4f",
   width = 120,
   height = 32,
 }: {

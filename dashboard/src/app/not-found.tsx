@@ -9,7 +9,7 @@ export default function NotFound() {
         This link is invalid or the client no longer exists. Double-check the URL
         you were given.
       </p>
-      <Link href="/" className="mt-6 rounded-lg accent-bg px-4 py-2 text-sm font-medium text-white">
+      <Link href="/" className="mt-6 rounded-lg accent-bg px-4 py-2 text-sm font-medium">
         Back home
       </Link>
     </main>

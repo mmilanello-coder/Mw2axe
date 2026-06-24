@@ -15,7 +15,7 @@ import type { ClientConfig } from "./types";
 const DEMO: ClientConfig = {
   slug: "demo",
   name: "Acme Outbound (Demo)",
-  accentColor: "#6366f1",
+  accentColor: "#aad8d8",
 };
 
 function parseEnvClients(): ClientConfig[] {

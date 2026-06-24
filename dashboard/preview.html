@@ -3,39 +3,41 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Anteprima — Instantly Live Dashboard</title>
+<title>Anteprima — Axend Live Dashboard</title>
 <style>
   :root{
-    --accent:#6366f1; --bg:#0b0d12; --panel:#12151c; --panel-2:#171b24;
-    --border:#232936; --text:#e6e9ef; --muted:#8a92a6; --good:#34d399;
-    --warn:#fbbf24; --bad:#f87171;
+    --accent:#aad8d8; --accent-strong:#244f4f; --accent-ink:#022226;
+    --bg:#ffffff; --panel:#ffffff; --panel-2:#f2f8f8; --border:#dce8e8;
+    --text:#244f4f; --ink:#022226; --muted:#6e8b8b;
+    --good:#1f9d7a; --warn:#c08a1e; --bad:#d2453e;
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--text);
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 60px}
   .row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .muted{color:var(--muted)} .accent{color:var(--accent)}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px}
+  .muted{color:var(--muted)} .accent{color:var(--accent-strong)}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    box-shadow:0 1px 2px rgba(2,34,38,.04),0 1px 3px rgba(2,34,38,.05)}
   .card2{background:var(--panel-2);border:1px solid var(--border);border-radius:12px}
   .pulse{width:8px;height:8px;border-radius:50%;background:var(--good);
-    box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:p 2s infinite;display:inline-block}
-  @keyframes p{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-  h1{font-size:24px;margin:4px 0 0} .tiny{font-size:12px}
+    box-shadow:0 0 0 0 rgba(31,157,122,.7);animation:p 2s infinite;display:inline-block}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(31,157,122,.55)}70%{box-shadow:0 0 0 8px rgba(31,157,122,0)}100%{box-shadow:0 0 0 0 rgba(31,157,122,0)}}
+  h1{font-size:24px;margin:4px 0 0;color:var(--ink)} .tiny{font-size:12px}
   .pills{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
   .pills button{background:transparent;color:var(--muted);border:0;padding:7px 12px;font-size:13px;cursor:pointer}
-  .pills button.on{background:var(--accent);color:#fff}
+  .pills button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
   nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:18px 0 22px;overflow-x:auto}
   nav.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);
     padding:10px 16px;font-size:14px;cursor:pointer;white-space:nowrap}
-  nav.tabs button.on{color:var(--text);border-color:var(--accent);font-weight:600}
+  nav.tabs button.on{color:var(--ink);border-color:var(--accent-strong);font-weight:600}
   .grid{display:grid;gap:16px}
   .kpis{grid-template-columns:repeat(2,1fr)}
   @media(min-width:640px){.kpis{grid-template-columns:repeat(3,1fr)}}
   @media(min-width:980px){.kpis{grid-template-columns:repeat(6,1fr)}}
   .kpi{padding:16px}
   .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-  .kpi .val{font-size:22px;font-weight:700;margin-top:8px}
+  .kpi .val{font-size:22px;font-weight:700;margin-top:8px;color:var(--ink)}
   .kpi .dl{font-size:12px;margin-top:4px}
   .two{display:grid;gap:16px;grid-template-columns:1fr}
   @media(min-width:980px){.two{grid-template-columns:2fr 1fr}}
@@ -45,18 +47,20 @@
   tbody tr{border-top:1px solid var(--border)}
   .r{text-align:right}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-  .bar{height:8px;border-radius:99px;background:var(--panel-2);overflow:hidden}
-  .bar>span{display:block;height:100%;border-radius:99px;background:var(--accent)}
+  .bar{height:8px;border-radius:99px;background:var(--panel-2);overflow:hidden;border:1px solid var(--border)}
+  .bar>span{display:block;height:100%;border-radius:99px;background:var(--accent-strong)}
   .hide{display:none}
   .btn{border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  b{color:var(--ink)}
   .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px}
   .legend span{display:flex;align-items:center;gap:6px}
-  .note{background:#1a1430;border:1px solid #34306a;border-radius:12px;padding:12px 14px;font-size:13px;color:#c9c6f0;margin-bottom:18px}
+  .note{background:#eef7f7;border:1px solid #cfe6e6;border-radius:12px;padding:12px 14px;font-size:13px;color:#244f4f;margin-bottom:18px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="note">👀 Anteprima statica — stesso design dell'app reale, dati demo. Nell'app vera i dati arrivano live da Instantly e i pulsanti (commenti, export, refresh) sono attivi.</div>
+  <div class="note">👀 Anteprima statica — brand <b>Axend</b>, stesso design dell'app reale, dati demo. Nell'app vera i dati arrivano live da Instantly e i pulsanti (commenti, export, refresh) sono attivi.</div>
 
   <header class="row">
     <div>
@@ -94,6 +98,7 @@
 const fmt=n=>new Intl.NumberFormat("it-IT").format(Math.round(n));
 const pct=(a,b)=>b?(a/b*100).toFixed(1)+"%":"0%";
 const money=n=>"$"+new Intl.NumberFormat("it-IT").format(Math.round(n));
+const C={sent:"#244f4f",opens:"#1f9d7a",replies:"#c08a1e",strong:"#244f4f"};
 
 // ---- demo data ----
 const CN=["Q2 Outbound — SaaS Founders","Agency Owners — Cold Seq","E-commerce DTC — Reactivation","Enterprise CTOs — ABM","Webinar Follow-up — Giugno","LinkedIn — Series A"];
@@ -128,27 +133,27 @@ const accs=[
 // ---- chart helpers ----
 function trend(data){
   const w=720,h=240,pl=44,pr=12,pt=14,pb=26,iw=w-pl-pr,ih=h-pt-pb;
-  const keys=[["sent","var(--accent)"],["opens","#34d399"],["replies","#fbbf24"]];
+  const keys=[["sent",C.sent],["opens",C.opens],["replies",C.replies]];
   const max=Math.max(...data.flatMap(d=>keys.map(k=>d[k[0]])))*1.15||1;
   const X=i=>pl+(i/(data.length-1))*iw, Y=v=>pt+ih-(v/max)*ih;
   let g="";
-  for(let i=0;i<=4;i++){const gy=pt+i/4*ih;g+=`<line x1="${pl}" x2="${w-pr}" y1="${gy}" y2="${gy}" stroke="#232936"/><text x="8" y="${gy+4}" fill="#8a92a6" font-size="10">${Math.round(max-i/4*max)}</text>`;}
+  for(let i=0;i<=4;i++){const gy=pt+i/4*ih;g+=`<line x1="${pl}" x2="${w-pr}" y1="${gy}" y2="${gy}" stroke="#e3eded"/><text x="8" y="${gy+4}" fill="#6e8b8b" font-size="10">${Math.round(max-i/4*max)}</text>`;}
   for(const [k,c] of keys){
     const pts=data.map((d,i)=>[X(i),Y(d[k])]);
     const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
-    g+=`<path d="${line} L${X(data.length-1)},${pt+ih} L${X(0)},${pt+ih} Z" fill="${c}" opacity="0.12"/><path d="${line}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
+    g+=`<path d="${line} L${X(data.length-1)},${pt+ih} L${X(0)},${pt+ih} Z" fill="${c}" opacity="0.10"/><path d="${line}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
   }
-  data.forEach((d,i)=>{if(i%5===0||i===data.length-1)g+=`<text x="${X(i)}" y="${h-8}" fill="#8a92a6" font-size="10" text-anchor="middle">${i+1}</text>`;});
+  data.forEach((d,i)=>{if(i%5===0||i===data.length-1)g+=`<text x="${X(i)}" y="${h-8}" fill="#6e8b8b" font-size="10" text-anchor="middle">${i+1}</text>`;});
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">${g}</svg>`;
 }
 function donut(v,label,color){
   const s=120,r=50,c=2*Math.PI*r,p=Math.max(0,Math.min(1,v));
   return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
-    <circle cx="60" cy="60" r="${r}" fill="none" stroke="#232936" stroke-width="10"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="#e3eded" stroke-width="10"/>
     <circle cx="60" cy="60" r="${r}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
       stroke-dasharray="${c*p} ${c}" transform="rotate(-90 60 60)"/>
-    <text x="60" y="58" text-anchor="middle" fill="#e6e9ef" font-size="20" font-weight="700">${(p*100).toFixed(1)}%</text>
-    <text x="60" y="76" text-anchor="middle" fill="#8a92a6" font-size="10">${label}</text></svg>`;
+    <text x="60" y="58" text-anchor="middle" fill="#022226" font-size="20" font-weight="700">${(p*100).toFixed(1)}%</text>
+    <text x="60" y="76" text-anchor="middle" fill="#6e8b8b" font-size="10">${label}</text></svg>`;
 }
 function kpi(lab,val,cur,pv,inv){
   let dl="";
@@ -157,7 +162,7 @@ function kpi(lab,val,cur,pv,inv){
     dl=`<span style="color:${col}">${ar} ${(Math.abs(d)*100).toFixed(1)}%</span> <span class="muted">vs prec.</span>`;}
   return `<div class="card kpi"><div class="lab">${lab}</div><div class="val">${val}</div><div class="dl tiny">${dl}</div></div>`;
 }
-function statusDot(s){const m={0:"#8a92a6",1:"#34d399",2:"#fbbf24",3:"#60a5fa","-2":"#f87171"};return m[s]||"#8a92a6";}
+function statusDot(s){const m={0:"#6e8b8b",1:"#1f9d7a",2:"#c08a1e",3:"#2f7da8","-2":"#d2453e"};return m[s]||"#6e8b8b";}
 function stLabel(s){return{0:"Draft",1:"Active",2:"Paused",3:"Completed"}[s]||"—";}
 function hColor(s){return s>=75?"var(--good)":s>=50?"var(--warn)":"var(--bad)";}
 
@@ -175,15 +180,15 @@ document.getElementById("overview").innerHTML=`
     <div class="card" style="padding:18px">
       <div class="row"><div><b>Sending & engagement</b><div class="tiny muted">Volume giornaliero nel periodo</div></div><button class="btn">💬 Comment</button></div>
       ${trend(daily)}
-      <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>Sent</span><span><span class="dot" style="background:#34d399"></span>Opens</span><span><span class="dot" style="background:#fbbf24"></span>Replies</span></div>
+      <div class="legend"><span><span class="dot" style="background:${C.sent}"></span>Sent</span><span><span class="dot" style="background:${C.opens}"></span>Opens</span><span><span class="dot" style="background:${C.replies}"></span>Replies</span></div>
     </div>
     <div class="card" style="padding:18px">
       <b>Pipeline generata</b>
-      <div style="font-size:28px;font-weight:700;color:var(--accent);margin-top:6px">${money(T.oppv)}</div>
+      <div style="font-size:28px;font-weight:700;color:var(--accent-strong);margin-top:6px">${money(T.oppv)}</div>
       <div class="tiny muted">da ${fmt(T.opps)} opportunità</div>
       <div class="row" style="justify-content:space-around;margin-top:18px">
-        ${donut(T.opens/T.sent,"Open rate","#34d399")}
-        ${donut(T.replies/T.sent,"Reply rate","var(--accent)")}
+        ${donut(T.opens/T.sent,"Open rate",C.opens)}
+        ${donut(T.replies/T.sent,"Reply rate",C.strong)}
       </div>
     </div>
   </div>
@@ -200,7 +205,7 @@ document.getElementById("campaigns").innerHTML=`
     <div style="padding:14px 16px;border-bottom:1px solid var(--border)"><b>Campaign performance</b></div>
     <div style="overflow-x:auto"><table><thead><tr><th>Campaign</th><th class="r">Sent</th><th class="r">Open</th><th class="r">Reply</th><th class="r">Clicks</th><th class="r">Bounce</th><th class="r">Opps</th><th class="r">Pipeline</th></tr></thead><tbody>
     ${[...camps].sort((a,b)=>b.sent-a.sent).map(c=>`<tr>
-      <td><div style="font-weight:500">${c.name}</div><div class="tiny muted"><span class="dot" style="background:${statusDot(c.status)}"></span>${stLabel(c.status)}</div></td>
+      <td><div style="font-weight:500;color:var(--ink)">${c.name}</div><div class="tiny muted"><span class="dot" style="background:${statusDot(c.status)}"></span>${stLabel(c.status)}</div></td>
       <td class="r">${fmt(c.sent)}</td>
       <td class="r" style="color:${c.opens/c.sent>0.5?'var(--good)':''}">${pct(c.opens,c.sent)}</td>
       <td class="r" style="color:${c.replies/c.sent>0.03?'var(--good)':''}">${pct(c.replies,c.sent)}</td>
@@ -222,7 +227,7 @@ document.getElementById("deliverability").innerHTML=`
     <div style="padding:14px 16px;border-bottom:1px solid var(--border)"><b>Inbox / account health</b></div>
     <div style="overflow-x:auto"><table><thead><tr><th>Account</th><th>Provider</th><th>Status</th><th>Warmup</th><th class="r">Daily cap</th><th>Health</th></tr></thead><tbody>
     ${[...accs].sort((a,b)=>a.health-b.health).map(a=>`<tr>
-      <td style="font-weight:500">${a.email}</td><td class="muted">${a.provider}</td>
+      <td style="font-weight:500;color:var(--ink)">${a.email}</td><td class="muted">${a.provider}</td>
       <td style="color:${a.status===1?'var(--good)':a.status===2?'var(--warn)':'var(--bad)'}">${a.statusLabel}</td>
       <td>${a.warmup}</td><td class="r muted">40/day</td>
       <td><div class="row" style="gap:8px;justify-content:flex-start"><div class="bar" style="width:90px"><span style="width:${a.health}%;background:${hColor(a.health)}"></span></div><span style="color:${hColor(a.health)}">${a.health}</span></div></td></tr>`).join("")}
@@ -230,7 +235,7 @@ document.getElementById("deliverability").innerHTML=`
   </div>`;
 
 document.getElementById("feedback").innerHTML=`
-  <div class="card" style="padding:18px"><div class="row"><div><b>Feedback & collaboration</b><div class="tiny muted">Il cliente lascia note, domande o segnalazioni — tu le vedi in tempo reale.</div></div><button class="btn">💬 Comment</button></div></div>
+  <div class="card" style="padding:18px"><div class="row"><div><b>Feedback & collaboration</b><div class="tiny muted">Il cliente lascia note, domande o segnalazioni — tu le vedi in tempo reale.</div></div><button class="btn primary">💬 Comment</button></div></div>
   <div class="card" style="padding:16px;margin-top:14px">
     <div class="row" style="justify-content:flex-start;gap:12px;align-items:flex-start">
       <span style="font-size:18px">💬</span><div><div class="tiny"><b>Marco</b> <span class="muted">su Q2 Outbound — SaaS Founders</span></div>
@@ -247,8 +252,8 @@ document.getElementById("feedback").innerHTML=`
 document.getElementById("report").innerHTML=`
   <div class="card" style="padding:22px">
     <div class="row"><div><div class="tiny muted" style="text-transform:uppercase;letter-spacing:.18em">Performance report</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px">Acme Outbound</div><div class="tiny muted">ultimi 30 giorni</div></div>
-      <div class="row" style="gap:8px"><button class="btn">⬇ CSV</button><button class="btn" style="background:var(--accent);color:#fff;border-color:var(--accent)">🖨 Save as PDF</button></div></div>
+      <div style="font-size:22px;font-weight:700;margin-top:4px;color:var(--ink)">Acme Outbound</div><div class="tiny muted">ultimi 30 giorni</div></div>
+      <div class="row" style="gap:8px"><button class="btn">⬇ CSV</button><button class="btn primary">🖨 Save as PDF</button></div></div>
     <p style="font-size:15px;line-height:1.6;max-width:640px">In questo periodo abbiamo inviato <b>${fmt(T.sent)}</b> email, con un open rate del <b>${pct(T.opens,T.sent)}</b> e reply rate del <b>${pct(T.replies,T.sent)}</b>. Generate <b>${fmt(T.replies)}</b> risposte e <b>${fmt(T.opps)}</b> opportunità per circa <b>${money(T.oppv)}</b> di pipeline. Bounce rate al <b>${pct(T.bounced,T.sent)}</b>.</p>
     <div class="tiny muted" style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px">Generato ora · Fonte: Instantly (live)</div>
   </div>`;
