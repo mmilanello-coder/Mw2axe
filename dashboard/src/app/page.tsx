@@ -42,11 +42,7 @@ export default async function Home() {
 
       <p className="mt-10 text-xs muted">
         Tip: configure clients in Supabase (<code>clients</code> table) or via the{" "}
-        <code>DASHBOARD_CLIENTS</code> env var. With no config, the{" "}
-        <Link className="accent" href="/c/demo">
-          demo
-        </Link>{" "}
-        client runs on mock data.
+        <code>DASHBOARD_CLIENTS</code> env var.
       </p>
     </main>
   );
