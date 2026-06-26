@@ -44,9 +44,10 @@ const BUILTINS: Record<string, Builtin> = {
     name: "Geriko",
     live: true,
     accentColor: "#aad8d8",
-    // Geriko's campaigns are the ones that SEND from rosa/emanuele @metodogeriko.it
-    // (robust regardless of campaign name), and its accounts are @metodogeriko.
+    // Geriko's campaigns = sent from rosa/emanuele @metodogeriko.it OR named
+    // "Geriko ..." (catches duplicated "copy" campaigns sent from other accounts).
     campaignAccountMatch: ["metodogeriko"],
+    campaignMatch: ["geriko"],
     accountMatch: ["metodogeriko"],
   },
 };
