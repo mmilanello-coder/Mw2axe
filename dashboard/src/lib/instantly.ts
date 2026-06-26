@@ -192,7 +192,7 @@ export function matchesKeywords(name: string, keywords?: string[]): boolean {
   return keywords.some((k) => n.includes(k.toLowerCase()));
 }
 
-type CampaignLite = { id: string; name: string; status: number; accounts: string[] };
+export type CampaignLite = { id: string; name: string; status: number; accounts: string[] };
 
 /** GET /campaigns — light list incl. each campaign's sending accounts (email_list). */
 export async function fetchCampaignsLite(apiKey: string): Promise<CampaignLite[]> {
@@ -220,26 +220,56 @@ export async function fetchCampaignsLite(apiKey: string): Promise<CampaignLite[]
 }
 
 /**
- * Resolve the set of campaign IDs this client is scoped to.
- * Prefers matching by SENDING ACCOUNT (accountKeywords); falls back to campaign
- * NAME keywords; returns null when there is no scope (all campaigns).
+ * Current (live) campaigns in this client's scope — by sending account OR by
+ * name. Includes drafts/paused (which have no analytics rows yet), so the
+ * dashboard can list every campaign that belongs to the client.
+ */
+export async function getScopedLiteCampaigns(
+  apiKey: string,
+  opts: { accountKeywords?: string[]; nameKeywords?: string[] }
+): Promise<CampaignLite[] | null> {
+  const hasAcct = !!(opts.accountKeywords && opts.accountKeywords.length);
+  const hasName = !!(opts.nameKeywords && opts.nameKeywords.length);
+  if (!hasAcct && !hasName) return null;
+  const camps = await fetchCampaignsLite(apiKey);
+  return camps.filter(
+    (c) =>
+      (hasAcct && c.accounts.some((a) => matchesKeywords(a, opts.accountKeywords))) ||
+      (hasName && matchesKeywords(c.name, opts.nameKeywords))
+  );
+}
+
+/**
+ * Resolve the set of campaign IDs this client is scoped to — the UNION of:
+ *  - campaigns that SEND from a matching account (accountKeywords), and
+ *  - campaigns whose NAME matches (nameKeywords), over a wide window so
+ *    historical / duplicated ("copy") campaigns are included too.
+ * Returns null when there is no scope (all campaigns).
  */
 export async function getScopedCampaignIds(
   apiKey: string,
   opts: { accountKeywords?: string[]; nameKeywords?: string[] }
 ): Promise<Set<string> | null> {
-  if (opts.accountKeywords && opts.accountKeywords.length) {
+  const hasAcct = !!(opts.accountKeywords && opts.accountKeywords.length);
+  const hasName = !!(opts.nameKeywords && opts.nameKeywords.length);
+  if (!hasAcct && !hasName) return null;
+
+  const ids = new Set<string>();
+  if (hasAcct) {
     const camps = await fetchCampaignsLite(apiKey);
-    const ids = camps
-      .filter((c) => c.accounts.some((a) => matchesKeywords(a, opts.accountKeywords)))
-      .map((c) => c.id);
-    return new Set(ids);
+    for (const c of camps) {
+      if (c.accounts.some((a) => matchesKeywords(a, opts.accountKeywords))) ids.add(c.id);
+    }
   }
-  if (opts.nameKeywords && opts.nameKeywords.length) {
-    const camps = await fetchCampaignAnalytics(apiKey);
-    return new Set(camps.filter((c) => matchesKeywords(c.name, opts.nameKeywords)).map((c) => c.id));
+  if (hasName) {
+    const end = new Date().toISOString().slice(0, 10);
+    const start = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
+    const camps = await fetchCampaignAnalytics(apiKey, start, end);
+    for (const c of camps) {
+      if (matchesKeywords(c.name, opts.nameKeywords)) ids.add(c.id);
+    }
   }
-  return null;
+  return ids;
 }
 
 type RawAccount = Record<string, unknown>;

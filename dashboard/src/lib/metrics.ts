@@ -6,9 +6,19 @@ import {
   fetchCampaignAnalytics,
   fetchDailyAnalytics,
   fetchDailyForCampaigns,
-  getScopedCampaignIds,
+  getScopedLiteCampaigns,
   matchesKeywords,
 } from "./instantly";
+
+function zeroCampaign(id: string, name: string, status: number): CampaignAnalytics {
+  return {
+    id, name, status,
+    leads: 0, contacted: 0, emailsSent: 0,
+    opens: 0, opensUnique: 0, replies: 0, repliesUnique: 0,
+    clicks: 0, clicksUnique: 0, bounced: 0, unsubscribed: 0,
+    completed: 0, opportunities: 0, opportunityValue: 0,
+  };
+}
 import { mockAccounts, mockCampaigns, mockDaily } from "./mock";
 import type {
   CampaignAnalytics,
@@ -153,22 +163,31 @@ export async function buildSnapshot(
 
   if (client.instantlyApiKey) {
     try {
-      // Scope to this client's campaigns (by sending account) + accounts.
-      const [scopedIds, allCampaigns, allAccounts] = await Promise.all([
-        getScopedCampaignIds(client.instantlyApiKey, {
+      // Scope to this client's current campaigns (by sending account OR name),
+      // including drafts that have no analytics yet.
+      const [liteScoped, allCampaigns, allAccounts] = await Promise.all([
+        getScopedLiteCampaigns(client.instantlyApiKey, {
           accountKeywords: client.campaignAccountMatch,
           nameKeywords: client.campaignMatch,
         }),
         fetchCampaignAnalytics(client.instantlyApiKey, start, end),
         fetchAccounts(client.instantlyApiKey),
       ]);
-      campaigns = scopedIds ? allCampaigns.filter((c) => scopedIds.has(c.id)) : allCampaigns;
+      if (liteScoped) {
+        const byId = new Map(allCampaigns.map((c) => [c.id, c]));
+        campaigns = liteScoped.map((lc) => {
+          const a = byId.get(lc.id);
+          return a ? { ...a, name: lc.name, status: lc.status } : zeroCampaign(lc.id, lc.name, lc.status);
+        });
+      } else {
+        campaigns = allCampaigns;
+      }
       accounts = allAccounts.filter((a) => matchesKeywords(a.email, client.accountMatch));
-      // Trend: when scoped, sum the per-campaign daily series; else workspace-wide.
-      daily = scopedIds
+      // Trend: when scoped, sum the per-campaign daily series (only those with sends).
+      daily = liteScoped
         ? await fetchDailyForCampaigns(
             client.instantlyApiKey,
-            campaigns.map((c) => c.id),
+            campaigns.filter((c) => c.emailsSent > 0).map((c) => c.id),
             start,
             end
           )
