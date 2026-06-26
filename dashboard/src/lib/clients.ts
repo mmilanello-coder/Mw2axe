@@ -49,7 +49,6 @@ const BUILTINS: Record<string, Builtin> = {
     campaignAccountMatch: ["metodogeriko"],
     accountMatch: ["metodogeriko"],
   },
-  demo: { name: "Acme Outbound (Demo)", live: false, accentColor: "#aad8d8" },
 };
 
 function parseEnvClients(): ClientConfig[] {
