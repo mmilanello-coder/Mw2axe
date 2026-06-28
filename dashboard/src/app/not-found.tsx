@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export default function NotFound() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-6 text-center">
-      <span className="brand-mark mb-5" style={{ width: 44, height: 44, fontSize: 18 }}>
-        A
-      </span>
+      <div className="mb-5">
+        <Logo />
+      </div>
       <div className="text-xs uppercase tracking-widest muted">404</div>
       <h1 className="mt-2 text-2xl font-bold">Dashboard non trovata</h1>
       <p className="mt-2 text-sm muted">

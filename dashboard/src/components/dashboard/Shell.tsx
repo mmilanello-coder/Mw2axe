@@ -11,6 +11,7 @@ import { EngagementTab } from "./EngagementTab";
 import { FeedbackTab } from "./FeedbackTab";
 import { ReportTab } from "./ReportTab";
 import { fmtDateTime } from "@/lib/format";
+import { Logo } from "@/components/Logo";
 
 type Tab =
   | "overview"
@@ -49,11 +50,9 @@ export function Shell({ slug }: { slug: string }) {
     <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
       {/* Header */}
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <span className="brand-mark" aria-hidden>
-            {(snapshot?.client.name ?? "·").charAt(0).toUpperCase()}
-          </span>
-          <div>
+        <div className="flex items-center gap-4">
+          <Logo />
+          <div className="border-l border-[var(--border)] pl-4">
             <div className="flex items-center gap-2">
               <span className="pulse-dot" />
               <span className="text-xs uppercase tracking-widest muted">

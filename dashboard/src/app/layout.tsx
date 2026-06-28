@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Live Dashboard — Instantly",
-  description: "Real-time outbound analytics dashboard powered by Instantly.ai",
+  title: "Axend — Live Dashboard",
+  description: "Dashboard outbound in tempo reale, powered by Instantly.ai · Axend",
+  icons: { icon: "/axend-logo.png" },
 };
 
 export default function RootLayout({

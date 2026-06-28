@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listClients } from "@/lib/clients";
+import { Logo } from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
 
@@ -10,16 +11,11 @@ export default async function Home() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-16 md:py-24">
       {/* Hero */}
-      <div className="flex items-center gap-3">
-        <span className="brand-mark">A</span>
-        <div className="leading-tight">
-          <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-            Axend
-          </div>
-          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] muted">
-            <span className="pulse-dot" />
-            Live Dashboards
-          </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <Logo size="lg" />
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] muted">
+          <span className="pulse-dot" />
+          Live Dashboards
         </div>
       </div>
 
