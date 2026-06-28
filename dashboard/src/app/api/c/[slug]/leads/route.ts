@@ -77,10 +77,38 @@ export async function GET(
     };
   });
 
+  // Dedupe by email — a person can be in several campaigns; merge their
+  // engagement into one row (sum opens/clicks/replies, keep the best interest).
+  const byEmail = new Map<string, Lead>();
+  for (const l of leads) {
+    const k = l.email.toLowerCase();
+    const ex = byEmail.get(k);
+    if (!ex) {
+      byEmail.set(k, { ...l });
+      continue;
+    }
+    ex.opens += l.opens;
+    ex.clicks += l.clicks;
+    ex.replies += l.replies;
+    if (l.interestStatus > ex.interestStatus) {
+      ex.interestStatus = l.interestStatus;
+      ex.interestLabel = l.interestLabel;
+    }
+    if (!ex.phone && l.phone) ex.phone = l.phone;
+    if (!ex.verified && l.verified) {
+      ex.verified = true;
+      ex.quality = l.quality;
+      ex.result = l.result;
+    }
+    if ((l.lastOpen || "") > (ex.lastOpen || "")) ex.lastOpen = l.lastOpen;
+  }
+  leads = [...byEmail.values()];
+
   let rows = leads;
   if (filter === "opened") rows = rows.filter((l) => l.opens > 0);
   else if (filter === "clicked") rows = rows.filter((l) => l.clicks > 0);
   else if (filter === "replied") rows = rows.filter((l) => l.replies > 0);
+  else if (filter === "interested") rows = rows.filter((l) => l.interestStatus > 0);
   if (q) {
     rows = rows.filter(
       (l) =>
@@ -97,6 +125,7 @@ export async function GET(
     opened: leads.filter((l) => l.opens > 0).length,
     clicked: leads.filter((l) => l.clicks > 0).length,
     replied: leads.filter((l) => l.replies > 0).length,
+    interested: leads.filter((l) => l.interestStatus > 0).length,
   };
 
   const enriched = leads.filter((l) => l.verified).length;

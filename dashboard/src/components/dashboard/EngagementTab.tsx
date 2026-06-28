@@ -10,6 +10,8 @@ import { fmtInt } from "@/lib/format";
 // Drive report (phone, verification, clean details) joined by email — so Geriko
 // can follow up by phone with the people actually showing interest.
 const FILTERS = [
+  { id: "interested", label: "Interessati" },
+  { id: "replied", label: "Hanno risposto" },
   { id: "opened", label: "Hanno aperto" },
   { id: "clicked", label: "Hanno cliccato" },
   { id: "all", label: "Tutti gli engaged" },
@@ -26,14 +28,16 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
     filter === "all" ? l.opens > 0 || l.clicks > 0 : true
   );
   const withPhone = rows.filter((l) => l.phone).length;
+  const interestColor = (v: number) =>
+    v >= 1 ? "var(--good)" : v < 0 ? "var(--bad)" : "var(--muted)";
 
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Stat label="Hanno aperto" value={data ? fmtInt(data.engaged.opened) : "…"} color="#1f9d7a" />
-        <Stat label="Hanno cliccato" value={data ? fmtInt(data.engaged.clicked) : "…"} color="#244f4f" />
-        <Stat label="Arricchiti dal file" value={data ? fmtInt(data.enriched ?? 0) : "…"} />
-        <Stat label="Con telefono" value={fmtInt(withPhone)} color="#c08a1e" />
+        <Stat label="Interessati" value={data ? fmtInt(data.engaged.interested) : "…"} color="#1f9d7a" />
+        <Stat label="Hanno risposto" value={data ? fmtInt(data.engaged.replied) : "…"} color="#c08a1e" />
+        <Stat label="Hanno aperto" value={data ? fmtInt(data.engaged.opened) : "…"} color="#244f4f" />
+        <Stat label="Con telefono" value={fmtInt(withPhone)} />
       </div>
 
       <div className="card flex flex-wrap items-center gap-3 p-3 no-print">
@@ -85,6 +89,7 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
                 <th className="px-5 py-3 font-medium">Azienda</th>
                 <th className="px-5 py-3 font-medium">Città</th>
                 <th className="px-5 py-3 font-medium">Telefono</th>
+                <th className="px-5 py-3 font-medium">Stato</th>
                 <th className="px-5 py-3 font-medium">Verifica</th>
                 <th className="px-5 py-3 text-right font-medium">Aperture</th>
                 <th className="px-5 py-3 text-right font-medium">Click</th>
@@ -92,9 +97,9 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
             </thead>
             <tbody>
               {isLoading && !data ? (
-                <tr><td colSpan={7} className="px-5 py-8 text-center muted">Carico…</td></tr>
+                <tr><td colSpan={8} className="px-5 py-8 text-center muted">Carico…</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={7} className="px-5 py-8 text-center muted">Nessun contatto con questo filtro.</td></tr>
+                <tr><td colSpan={8} className="px-5 py-8 text-center muted">Nessun contatto con questo filtro.</td></tr>
               ) : (
                 rows.map((l) => (
                   <tr key={l.id} className="border-t border-[var(--border)] hover:bg-[var(--panel-2)]">
@@ -112,6 +117,25 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
                         <a href={`tel:${l.phone.replace(/\s/g, "")}`} className="font-medium accent">
                           {l.phone}
                         </a>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      {l.interestStatus !== 0 ? (
+                        <span
+                          className="rounded-md px-2 py-0.5 text-xs"
+                          style={{ background: "rgba(31,157,122,.12)", color: interestColor(l.interestStatus) }}
+                        >
+                          {l.interestLabel}
+                        </span>
+                      ) : l.replies > 0 ? (
+                        <span
+                          className="rounded-md px-2 py-0.5 text-xs"
+                          style={{ background: "rgba(192,138,30,.14)", color: "var(--warn)" }}
+                        >
+                          Risposto
+                        </span>
                       ) : (
                         <span className="muted">—</span>
                       )}

@@ -176,6 +176,8 @@ export function mockLeads(slug: string, campaigns: { id: string; name: string }[
       replies,
       status,
       statusLabel: status === 1 ? "Active" : status === 2 ? "Completed" : "Unsubscribed",
+      interestStatus: replies > 0 ? 1 : 0,
+      interestLabel: replies > 0 ? "Interessato" : "",
       campaignId: camp.id,
       lastContact: d.toISOString(),
       lastOpen: opens ? d.toISOString() : null,
