@@ -65,6 +65,19 @@ h1, h2 { color: var(--ink); letter-spacing: -0.01em; }
   color: var(--accent-ink); font-weight: 800; font-size: 15px;
   box-shadow: 0 4px 12px -4px rgba(36, 79, 79, 0.4);
 }
+
+/* Official AXEND logo (white wordmark) on a dark-teal chip — readable on the
+   light UI and faithful to the brand. */
+.logo-chip {
+  display: inline-flex; align-items: center;
+  background: var(--ink);
+  border-radius: 12px;
+  padding: 9px 14px;
+  box-shadow: 0 8px 22px -10px rgba(2, 34, 38, 0.5);
+}
+.logo-chip img { height: 18px; width: auto; display: block; }
+.logo-chip.lg { padding: 16px 24px; border-radius: 16px; }
+.logo-chip.lg img { height: 30px; }
 .card-2 {
   background: var(--panel-2);
   border: 1px solid var(--border);
