@@ -24,9 +24,11 @@ export function KpiCard({
   const arrow = neutral ? "→" : d > 0 ? "▲" : "▼";
 
   return (
-    <div className="card px-5 py-4">
+    <div className="card lift px-5 py-4">
       <div className="text-xs uppercase tracking-wide muted">{label}</div>
-      <div className="mt-2 text-2xl font-bold tabular-nums">{value}</div>
+      <div className="mt-2 text-2xl font-bold tabular-nums" style={{ color: "var(--ink)" }}>
+        {value}
+      </div>
       <div className="mt-1 flex items-center gap-2 text-xs">
         {hasDelta ? (
           <span style={{ color }} className="tabular-nums">

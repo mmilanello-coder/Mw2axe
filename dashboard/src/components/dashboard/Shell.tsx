@@ -49,20 +49,25 @@ export function Shell({ slug }: { slug: string }) {
     <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
       {/* Header */}
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="pulse-dot" />
-            <span className="text-xs uppercase tracking-widest muted">
-              Live · {snapshot?.source === "instantly" ? "Instantly" : "Demo data"}
-            </span>
-          </div>
-          <h1 className="mt-1 text-2xl font-bold">
-            {snapshot?.client.name ?? "Loading…"}
-          </h1>
-          <div className="text-xs muted">
-            {snapshot
-              ? `Updated ${fmtDateTime(snapshot.generatedAt)}`
-              : "Fetching latest…"}
+        <div className="flex items-center gap-3.5">
+          <span className="brand-mark" aria-hidden>
+            {(snapshot?.client.name ?? "·").charAt(0).toUpperCase()}
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="pulse-dot" />
+              <span className="text-xs uppercase tracking-widest muted">
+                Live · {snapshot?.source === "instantly" ? "Instantly" : "Demo"}
+              </span>
+            </div>
+            <h1 className="mt-0.5 text-2xl font-bold leading-tight">
+              {snapshot?.client.name ?? "Caricamento…"}
+            </h1>
+            <div className="text-xs muted">
+              {snapshot
+                ? `Aggiornato ${fmtDateTime(snapshot.generatedAt)}`
+                : "Recupero dati…"}
+            </div>
           </div>
         </div>
 
@@ -133,8 +138,9 @@ export function Shell({ slug }: { slug: string }) {
         </div>
       )}
 
-      <footer className="mt-10 text-center text-xs muted no-print">
-        Powered by Instantly.ai · Live dashboard
+      <footer className="mt-12 flex items-center justify-center gap-2 border-t border-[var(--border)] pt-5 text-xs muted no-print">
+        <span className="pulse-dot" style={{ width: 6, height: 6 }} />
+        Axend · dati live da Instantly.ai · aggiornamento automatico
       </footer>
     </div>
   );
