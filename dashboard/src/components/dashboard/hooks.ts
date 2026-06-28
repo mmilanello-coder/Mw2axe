@@ -39,7 +39,7 @@ export type LeadsResponse = {
   total: number;
   shown: number;
   enriched?: number;
-  engaged: { opened: number; clicked: number; replied: number };
+  engaged: { opened: number; clicked: number; replied: number; interested: number };
   leads: Lead[];
 };
 

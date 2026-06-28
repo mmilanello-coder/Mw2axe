@@ -93,6 +93,9 @@ export type Lead = {
   replies: number;
   status: number;
   statusLabel: string;
+  /** Instantly lead interest status (lt_interest_status): >0 = positive. */
+  interestStatus: number;
+  interestLabel: string;
   campaignId: string;
   lastContact: string | null;
   lastOpen: string | null;

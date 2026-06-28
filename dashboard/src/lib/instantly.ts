@@ -362,6 +362,30 @@ function leadStatusLabel(status: number): string {
 
 type RawLead = Record<string, unknown>;
 
+// Instantly lead interest status (lt_interest_status).
+function interestLabel(v: number): string {
+  switch (v) {
+    case 1:
+      return "Interessato";
+    case 2:
+      return "Meeting fissato";
+    case 3:
+      return "Meeting fatto";
+    case 4:
+      return "Chiuso / Vinto";
+    case 0:
+      return "Out of office";
+    case -1:
+      return "Non interessato";
+    case -2:
+      return "Persona sbagliata";
+    case -3:
+      return "Perso";
+    default:
+      return "";
+  }
+}
+
 function normLead(raw: RawLead): import("./types").Lead {
   const email = str(raw.email);
   const status = num(raw.status);
@@ -398,6 +422,8 @@ function normLead(raw: RawLead): import("./types").Lead {
     replies: num(raw.email_reply_count),
     status,
     statusLabel: leadStatusLabel(status),
+    interestStatus: num(raw.lt_interest_status),
+    interestLabel: interestLabel(num(raw.lt_interest_status)),
     campaignId: str(raw.campaign),
     lastContact: typeof lc === "string" ? lc : null,
     lastOpen: typeof lo === "string" ? lo : null,
