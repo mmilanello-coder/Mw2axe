@@ -15,25 +15,20 @@ export default async function Home() {
         <Logo size="lg" />
         <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] muted">
           <span className="pulse-dot" />
-          Live Dashboards
+          Live
         </div>
       </div>
 
       <h1 className="mt-8 text-4xl font-bold tracking-tight md:text-5xl">
-        Cruscotti outbound{" "}
-        <span style={{ color: "var(--accent-strong)" }}>in tempo reale</span>
+        Geriko <span style={{ color: "var(--accent-strong)" }}>Dashboard</span>
       </h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed muted">
-        Dashboard live e white-label costruite sull&apos;API di Instantly.ai. Ogni cliente
-        ha un link privato: metriche, deliverability, contatti e persone interessate —
-        aggiornati da soli, senza più report settimanali.
+        Performance outbound in tempo reale: metriche, deliverability, contatti e
+        persone interessate — aggiornate in automatico.
       </p>
 
       {/* Clients */}
       <div className="mt-12">
-        <div className="mb-3 text-xs font-medium uppercase tracking-wider muted">
-          Clienti ({clients.length})
-        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {clients.map((c) => {
             const accent = c.accentColor ?? "#aad8d8";
@@ -53,7 +48,7 @@ export default async function Home() {
                   <div className="truncate font-semibold" style={{ color: "var(--ink)" }}>
                     {c.name}
                   </div>
-                  <div className="truncate text-xs muted">/c/{c.slug}</div>
+                  <div className="truncate text-xs muted">Apri la dashboard</div>
                 </div>
                 <span className="accent text-sm font-medium transition-transform group-hover:translate-x-0.5">
                   Apri →
@@ -65,8 +60,7 @@ export default async function Home() {
       </div>
 
       <footer className="mt-16 border-t border-[var(--border)] pt-5 text-xs muted">
-        Powered by Instantly.ai · Configura i clienti in Supabase (<code>clients</code>) o
-        via <code>DASHBOARD_CLIENTS</code>.
+        Axend
       </footer>
     </main>
   );
