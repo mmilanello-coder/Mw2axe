@@ -163,7 +163,7 @@ export function ContactsTab({ snap, slug }: { snap: DashboardSnapshot; slug: str
                     </td>
                     <td className="px-5 py-3">{l.company || "—"}</td>
                     <td className="px-5 py-3 muted">{l.city || "—"}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-5 py-3 whitespace-nowrap">
                       {l.phone ? (
                         <a href={`tel:${l.phone.replace(/\s/g, "")}`} className="font-medium accent">
                           {l.phone}

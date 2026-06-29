@@ -17,6 +17,18 @@ const FILTERS = [
   { id: "all", label: "Tutti gli engaged" },
 ];
 
+// Normalise a website value into a safe href and a clean label (host only).
+function siteHref(u: string): string {
+  return /^https?:\/\//i.test(u) ? u : `https://${u}`;
+}
+function siteLabel(u: string): string {
+  try {
+    return new URL(siteHref(u)).hostname.replace(/^www\./, "");
+  } catch {
+    return u.replace(/^https?:\/\//i, "").replace(/^www\./, "").replace(/\/$/, "");
+  }
+}
+
 export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: string }) {
   const [filter, setFilter] = useState("opened");
   const [campaign, setCampaign] = useState("");
@@ -87,7 +99,7 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide muted">
                 <th className="px-5 py-3 font-medium">Contatto</th>
-                <th className="px-5 py-3 font-medium">Azienda</th>
+                <th className="px-5 py-3 font-medium">Azienda &amp; sito</th>
                 <th className="px-5 py-3 font-medium">Città</th>
                 <th className="px-5 py-3 font-medium">Telefono</th>
                 <th className="px-5 py-3 font-medium">Stato</th>
@@ -111,9 +123,21 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
                       </div>
                       <div className="text-xs muted">{l.email}</div>
                     </td>
-                    <td className="px-5 py-3">{l.company || "—"}</td>
-                    <td className="px-5 py-3 muted">{l.city || "—"}</td>
                     <td className="px-5 py-3">
+                      <div style={{ color: "var(--ink)" }}>{l.company || "—"}</div>
+                      {l.website ? (
+                        <a
+                          href={siteHref(l.website)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs accent hover:underline"
+                        >
+                          {siteLabel(l.website)} ↗
+                        </a>
+                      ) : null}
+                    </td>
+                    <td className="px-5 py-3 muted">{l.city || "—"}</td>
+                    <td className="px-5 py-3 whitespace-nowrap">
                       {l.phone ? (
                         <a href={`tel:${l.phone.replace(/\s/g, "")}`} className="font-medium accent">
                           {l.phone}
@@ -144,7 +168,7 @@ export function EngagementTab({ snap, slug }: { snap: DashboardSnapshot; slug: s
                     <td className="px-5 py-3">
                       {l.verified ? (
                         <span
-                          className="rounded-md px-2 py-0.5 text-xs"
+                          className="inline-block whitespace-nowrap rounded-md px-2 py-0.5 text-xs"
                           style={{
                             background: l.quality === "good" ? "rgba(31,157,122,.12)" : "var(--panel-2)",
                             color: l.quality === "good" ? "var(--good)" : "var(--muted)",
