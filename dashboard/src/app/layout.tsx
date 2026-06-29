@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Axend — Live Dashboard",
-  description: "Dashboard outbound in tempo reale, powered by Instantly.ai · Axend",
+  title: "Geriko Dashboard",
+  description: "Performance outbound in tempo reale · Axend",
   icons: { icon: "/axend-logo.png" },
 };
 
