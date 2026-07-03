@@ -128,8 +128,8 @@ export async function runAutomation(
           company_name: l.company_name,
         }));
         const res = await addLeadsToCampaign(apiKey, m.targetId, payload);
-        if (res.ok) result.added = eligible.length;
-        else result.error = `add failed: ${res.status} ${res.body}`;
+        result.added = res.added;
+        if (res.errors > 0) result.error = `${res.errors} lead non aggiunti (errore API)`;
       }
       results.push(result);
     } catch (err) {
