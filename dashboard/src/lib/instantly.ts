@@ -493,25 +493,57 @@ export async function fetchRawCampaignLeads(
   return out;
 }
 
-/** Bulk-add leads (by email + fields) to a destination campaign. LIVE write. */
+/**
+ * Add leads (by email + fields) to a destination campaign. LIVE write.
+ *
+ * Instantly's V2 create endpoint is `POST /leads` (one lead per call). We must
+ * pass skip_if_in_campaign/skip_if_in_workspace = false, otherwise a lead that
+ * already exists in the SOURCE campaign is skipped and never copied into the
+ * target. To stay idempotent (the daily cron re-runs), we first read the emails
+ * already in the target and only create the missing ones — so re-runs add zero.
+ */
 export async function addLeadsToCampaign(
   apiKey: string,
   campaignId: string,
   leads: Array<Record<string, unknown>>
-): Promise<{ ok: boolean; status: number; body: string }> {
-  const res = await fetch(BASE_URL + "/leads/list", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      campaign_id: campaignId,
-      skip_if_in_campaign: true,
-      skip_if_in_workspace: false,
-      leads,
-    }),
-    cache: "no-store",
-  });
-  const text = await res.text().catch(() => "");
-  return { ok: res.ok, status: res.status, body: text.slice(0, 300) };
+): Promise<{ ok: boolean; added: number; skipped: number; errors: number }> {
+  // Emails already in the target campaign → skip them (no duplicates on re-run).
+  let existing = new Set<string>();
+  try {
+    const cur = await fetchRawCampaignLeads(apiKey, campaignId, 5000);
+    existing = new Set(cur.map((l) => String(l.email ?? "").toLowerCase()).filter(Boolean));
+  } catch {
+    // If we can't read the target, fall through and rely on create-time dedup.
+  }
+
+  let added = 0, skipped = 0, errors = 0;
+  for (const l of leads) {
+    const email = String(l.email ?? "").toLowerCase();
+    if (!email) { errors++; continue; }
+    if (existing.has(email)) { skipped++; continue; }
+    try {
+      const res = await fetch(BASE_URL + "/leads", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaign: campaignId,
+          email: l.email,
+          first_name: l.first_name ?? "",
+          last_name: l.last_name ?? "",
+          company_name: l.company_name ?? "",
+          skip_if_in_campaign: false,
+          skip_if_in_workspace: false,
+        }),
+        cache: "no-store",
+      });
+      const j = (await res.json().catch(() => ({}))) as { id?: string; campaign?: string };
+      if (res.ok && j.id && j.campaign === campaignId) { added++; existing.add(email); }
+      else errors++;
+    } catch {
+      errors++;
+    }
+  }
+  return { ok: errors === 0, added, skipped, errors };
 }
 
 export { InstantlyError };
