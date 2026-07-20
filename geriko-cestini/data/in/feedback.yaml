@@ -1,0 +1,23 @@
+# Feedback Sassi/Carretta sulle 18 email inviate (Definitiva 1-5 + Estensione 6-9)
+# Stati: approvato | giallo (con nota) | scartato
+tono_note: ""            # eventuale indicazione generale sul registro emersa in call
+
+email:
+  1A_invenduto:        approvato   # default: aggiornare post-call
+  1B_primo_acquirente: approvato
+  2A_caso_cardano:     approvato
+  2B_collega_zona:     approvato
+  6A_extra_provvigione: {stato: giallo, nota: "testo inviato a 2.440 — confermare swap a 15.000 (surplus)"}
+  6B_sconto:           approvato
+  3A_tribunale:        approvato
+  3B_reputazione:      approvato
+  7A_barbara:          approvato
+  7B_arnieri:          {stato: giallo, nota: "consenso citazione in cold da confermare"}
+  4A_conto:            approvato
+  4B_incarico_perso:   approvato
+  8A_compromesso:      {stato: giallo, nota: "formula prudente finché graduatoria non confermata vincolante"}
+  8B_pagina_pubblica:  approvato
+  9A_velocita:         approvato
+  9B_costo_tempo:      approvato
+  5A_momento_giusto:   approvato
+  5B_numero_chiudo:    approvato

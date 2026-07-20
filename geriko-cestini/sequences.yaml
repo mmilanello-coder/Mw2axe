@@ -1,0 +1,66 @@
+# Ricette di sequenza per cestino — composte dalle 18 email inviate al cliente.
+# Regole ereditate dai doc: max 8 email · una prova per email · Step 9 sostituisce, non aggiunge ·
+# caso-prova scelto per zona · chiusura Rosa sempre ultima.
+# fallback: se un'email viene scartata dal feedback, subentra la successiva in lista.
+
+zone_prova:            # sostituzione del caso nello Step 2 (e nei richiami)
+  lombardia: 2A_caso_cardano
+  veneto_triveneto: 2B_collega_zona   # Ceccon (Vedelago)
+  emilia: 2B_collega_zona             # Barbara/Congiu
+  tagli_bassi: 2A_caso_varese         # override di fascia, vince sulla zona
+
+cestini:
+  A:  # open house + indipendente — priorità 1
+    giorni: [0, 4, 6, 9, 10, 12, 13, 18]
+    step:
+      - {slot: gancio,      email: 1B_primo_acquirente, fallback: [1A_invenduto]}
+      - {slot: prova,       email: per_zona}
+      - {slot: provvigione, email: 6A_extra_provvigione, fallback: [6B_sconto]}
+      - {slot: obiezione,   email: 3B_reputazione, fallback: [3A_tribunale]}   # OH = massima esposizione locale
+      - {slot: incarico,    email: 7A_barbara, fallback: [7B_arnieri]}
+      - {slot: domanda,     email: 4A_conto}
+      - {slot: trasparenza, email: 8B_pagina_pubblica, fallback: [8A_compromesso]}
+      - {slot: chiusura,    email: 5A_momento_giusto, alt: 5B_numero_chiudo}
+    candidata_esterna: "B1 open house (v2) come nuovo gancio — SOLO dopo approvazione cliente"
+    tono: da_feedback
+  B:  # indipendente, fascia >=150k — sequenza estesa standard
+    giorni: [0, 4, 6, 9, 10, 12, 13, 18]
+    step:
+      - {slot: gancio,      email: 1A_invenduto, ab: 1B_primo_acquirente}
+      - {slot: prova,       email: 2A_caso_cardano}
+      - {slot: provvigione, email: 6A_extra_provvigione}    # versione 15.000 post-conferma
+      - {slot: obiezione,   email: 3A_tribunale, ab: 3B_reputazione}
+      - {slot: incarico,    email: 7B_arnieri, fallback: [7A_barbara]}
+      - {slot: domanda,     email: 4A_conto}
+      - {slot: graduatoria, email: 8A_compromesso, ab: 8B_pagina_pubblica}
+      - {slot: chiusura,    email: 5B_numero_chiudo, alt: 5A_momento_giusto}
+  C:  # indipendente, fascia <150k — scala economica giusta, 15k TACIUTO
+    giorni: [0, 4, 6, 9, 12, 15]
+    step:
+      - {slot: gancio,      email: 1A_invenduto, sostituzione_se_invenduto_ratio_alto: 9A_velocita}
+      - {slot: prova,       email: 2A_caso_varese}          # 55->75,2k: fascia coerente
+      - {slot: provvigione, email: 6B_sconto}               # 400 EUR sentiti > 15k non creduti
+      - {slot: obiezione,   email: 3A_tribunale}
+      - {slot: domanda,     email: 4A_conto}
+      - {slot: chiusura,    email: 5A_momento_giusto}
+  D:  # multi-sede / mini-franchising — vocabolario struttura
+    giorni: [0, 4, 6, 9, 10, 12, 13, 18]
+    step:
+      - {slot: gancio,      email: 1B_primo_acquirente}
+      - {slot: prova,       email: per_zona}
+      - {slot: provvigione, email: 6A_extra_provvigione}
+      - {slot: obiezione,   email: 3A_tribunale}
+      - {slot: incarico,    email: 7A_barbara}              # battaglia per mandati = loro quotidiano
+      - {slot: domanda,     email: 4B_incarico_perso}
+      - {slot: graduatoria, email: 8A_compromesso}          # trattative saltate x n sedi
+      - {slot: chiusura,    email: 5B_numero_chiudo}
+    nota_ridondanza: "4B confina con lo Step1 delle campagne live: ok su lead MAI contattati (wave PG4); cautela sui 911 storici"
+  E:  # unknown — base Definitiva 5 step, zero assunzioni, tono sempre istituzionale
+    giorni: [0, 4, 9, 12, 15]
+    step:
+      - {slot: gancio,    email: 1A_invenduto, ab: 1B_primo_acquirente}
+      - {slot: prova,     email: per_zona}
+      - {slot: obiezione, email: 3A_tribunale, ab: 3B_reputazione}
+      - {slot: domanda,   email: 4A_conto}
+      - {slot: chiusura,  email: 5A_momento_giusto, ab: 5B_numero_chiudo}
+    tono: istituzionale_sempre

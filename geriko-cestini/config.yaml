@@ -1,0 +1,50 @@
+# geriko-cestini — configurazione
+input_mapping:            # colonne del CSV wave (Apollo)
+  domain: "Company Website Short"
+  company: "Cleaned Company Name"
+  first_name: "First Name"
+  last_name: "Last Name"
+  email: "Email"
+  employees: "Employee Count"
+  city: "Company City"
+  keywords: "Company Keywords"
+  description: "Company Short Description"
+
+providers:
+  scrape_direct:
+    enabled: true
+    pages: ["/", "annunci", "immobili", "vendite", "blog", "news"]   # match fuzzy sui link interni
+    timeout_s: 14
+    parallel: 24
+  perplexity_relay:
+    enabled: false          # SLOT — attivare dopo aver incollato la spec in prompts/perplexity_relay.md
+    budget_eur_max: 40      # tetto mensile concordato in call
+
+exclusions:
+  brands: ["tecnocasa", "tempocasa", "remax", "re/max", "gabetti", "grimaldi", "toscano", "professionecasa", "fondocasa", "kiron"]
+  solo_affitti_keywords: ["solo affitti", "affitti e locazioni", "property management", "gestione locazioni"]
+  # esclusione applicata solo se NESSUN segnale di vendita presente
+
+flags:
+  open_house:
+    patterns: ["open house", "openhouse", "porte aperte", "open day"]
+    require_evidence: true
+  nome_usabile:
+    rule: "fondatore o titolare verificato sul sito, agenzia proprietaria (non franchising). In dubbio: no."
+
+scoring:
+  cestini:
+    A: {when: "open_house==si and struttura==indipendente", copy: "B1 open house", priority: 1}
+    B: {when: "struttura==indipendente and fascia>=150000",  copy: "core + Cardano",  priority: 2}
+    C: {when: "struttura==indipendente and fascia<150000",   copy: "core + Varese",   priority: 3}
+    D: {when: "struttura in [multi_sede_piccola, mini_franchising]", copy: "B2 multiproposte", priority: 4}
+    E: {when: "else", copy: "core GENERIC", priority: 5}
+
+qa:
+  sample_size: 30
+  stratify_by: ["cestino"]
+  max_error_accettabile: 0.10   # sopra il 10%: cestino non utilizzabile, rivedere prompt/provider
+
+output:
+  split_con_nome: true          # separa CON NOME (nome_usabile==si) da GENERIC
+  instantly_columns: ["email","first_name","last_name","company","city","cestino","fascia_prezzo","open_house"]
