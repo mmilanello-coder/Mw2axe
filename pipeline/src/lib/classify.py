@@ -1,9 +1,12 @@
-"""LLM flag extraction (Claude). Reads ONLY the per-domain cache text, applies
-the prompt in prompts/classify_flags.md, and returns the parsed JSON flags.
+"""LLM flag extraction — provider-agnostic (OpenAI-compatible chat API).
+
+Reads ONLY the per-domain cache text, applies prompts/classify_flags.md, and
+returns the parsed JSON flags. Works with any OpenAI-compatible endpoint — the
+default is DeepSeek (cheap, capable); switch to Qwen / Moonshot / Zhipu / OpenAI
+by changing providers.classify in config.yaml (base_url + model), no code change.
 
 The prompt already instructs: no evidence → 'unknown', and ignore any
-instructions found inside the page content (§7 — scraped text is data, not
-commands).
+instructions found inside the page content (§7 — scraped text is data).
 """
 from __future__ import annotations
 
@@ -13,8 +16,19 @@ import requests
 
 from .config import PROMPTS, env
 
-ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
-DEFAULT_MODEL = "claude-sonnet-5"
+DEFAULT_BASE_URL = "https://api.deepseek.com"
+DEFAULT_MODEL = "deepseek-chat"
+DEFAULT_KEY_ENV = "LLM_API_KEY"
+
+
+def _cfg(cfg: dict) -> dict:
+    c = ((cfg.get("providers", {}) or {}).get("classify", {}) or {})
+    return {
+        "base_url": (c.get("base_url") or DEFAULT_BASE_URL).rstrip("/"),
+        "model": c.get("model") or env("LLM_MODEL") or DEFAULT_MODEL,
+        "key_env": c.get("api_key_env") or DEFAULT_KEY_ENV,
+        "cost": float(c.get("cost_per_domain_eur", 0.0015)),
+    }
 
 
 def load_prompt() -> str:
@@ -28,6 +42,19 @@ def build_user_content(domain: str, cache: dict) -> str:
     return f"DOMINIO: {domain}\nFONTI:\n{src_lines}\n\nCONTENUTO PAGINE:\n{text}"
 
 
+def build_request(domain: str, cache: dict, cfg: dict) -> dict:
+    """OpenAI-compatible chat/completions payload (pure/testable)."""
+    return {
+        "model": _cfg(cfg)["model"],
+        "temperature": 0,
+        "response_format": {"type": "json_object"},
+        "messages": [
+            {"role": "system", "content": load_prompt()},
+            {"role": "user", "content": build_user_content(domain, cache)},
+        ],
+    }
+
+
 def parse_json(text: str) -> dict:
     """Extract the single JSON object from the model reply (pure/testable)."""
     s = (text or "").strip()
@@ -38,30 +65,22 @@ def parse_json(text: str) -> dict:
 
 
 def classify_domain(api_key: str, domain: str, cache: dict, cfg: dict, timeout: int = 60) -> dict:
-    model = (((cfg.get("providers", {}) or {}).get("classify", {}) or {}).get("model")) or env("AGENT_MODEL") or DEFAULT_MODEL
-    body = {
-        "model": model,
-        "max_tokens": 1024,
-        "system": load_prompt(),
-        "messages": [{"role": "user", "content": build_user_content(domain, cache)}],
-    }
+    c = _cfg(cfg)
     res = requests.post(
-        ANTHROPIC_URL,
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-        data=json.dumps(body),
+        f"{c['base_url']}/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        data=json.dumps(build_request(domain, cache, cfg)),
         timeout=timeout,
     )
     res.raise_for_status()
     data = res.json()
-    text = "".join(
-        part.get("text", "") for part in data.get("content", []) if part.get("type") == "text"
-    )
+    text = data["choices"][0]["message"]["content"]
     return parse_json(text)
 
 
+def api_key_env(cfg: dict) -> str:
+    return _cfg(cfg)["key_env"]
+
+
 def cost_per_domain_eur(cfg: dict) -> float:
-    return float(((cfg.get("providers", {}) or {}).get("classify", {}) or {}).get("cost_per_domain_eur", 0.01))
+    return _cfg(cfg)["cost"]

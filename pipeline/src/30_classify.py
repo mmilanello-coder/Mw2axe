@@ -77,7 +77,7 @@ def main() -> int:
 
     budget = BudgetGuard(config.budget_cap_eur())
     per_domain = classify.cost_per_domain_eur(cfg)
-    api_key = config.env("ANTHROPIC_API_KEY")
+    api_key = config.env(classify.api_key_env(cfg))
     db = SupabaseWriter(dry_run=args.dry_run)
 
     all_rows, preview = [], []
