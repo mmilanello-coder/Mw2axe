@@ -72,6 +72,9 @@ NON eseguire alcuna azione su Instantly oltre la lettura.
 - **Per eseguirla a mano in una sessione nuova**: incollare il prompt della §3 in una sessione Claude Code (che abbia la env `Instantly_AXEND`).
 - **Per ricrearla da zero**: usare la UI Routines di claude.ai, oppure il tool `create_trigger` con i parametri della §1 e il prompt della §3.
 
-## 6 · Stato al 20/07/2026 (ultimo run manuale)
+## 6 · Stato al 21/07/2026 (ultimo run manuale)
 
-🔴 ROSSO. Caselle attive (warmup score 100 = interno). 2 campagne Sassi acquisizione ancora in **status -2 (errore)**. GENERIC Sassi a **0% aperture reali** su 40+ invii (spam pieno). Invii fermi dal 18/07. Verdetto: **non riprendere gli invii**; warmup + rampa soft da CON NOME quando le aperture reali risalgono. Sblocco/riattivazione = Marco.
+🟡→🔴. Caselle **tutte status 1 (sbloccate da Marco)**, warmup on, score 100 (interno). **Le 2 campagne Sassi acquisizione sono state RIATTIVATE oggi 21/07 alle 15:49 UTC** (status -2 → 1) — evento reale, non anomalia API (verificato: `timestamp_updated` odierno). Ma la reputazione NON è recuperata: **GENERIC Sassi 0% aperture reali su 42 invii** (spam pieno), CON NOME 14–33%, **bounce ancora elevati** (GENERIC Sassi ≈43%, CON NOME Rosa4 ≈19%). CON NOME Rosa4 ha ripreso a inviare (9 il 21/07). Verdetto: **tenere GENERIC Sassi ferma** (ogni invio approfondisce lo spam e alimenta i bounce), rampa soft SOLO da CON NOME a volume minimo, monitorare i bounce sui primi invii post-riattivazione. Esecuzione/pausa = Marco.
+
+### Storico run
+- **20/07** 🔴 — 2 Sassi in status -2 (errore); GENERIC 0% aperture su 40+ invii; invii fermi dal 18/07. Verdetto: non riprendere.
