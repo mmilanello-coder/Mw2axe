@@ -1,13 +1,17 @@
-"""20_enrich — per-domain enrichment via Apify, written to the cache.
+"""20_enrich — enrichment via Apify, written to the per-domain cache.
 
-Reads data/out/run_state.json (from 10_ingest). For each domain: if already
-cached, skip (resume — never re-pay); else run the Apify actor and cache the
-result. The classifier (30) reads ONLY from this cache.
+Reads data/out/run_state.json (from 10_ingest). Domains are crawled in BATCHES
+(one Apify actor run per chunk of `providers.apify.batch_size` domains) — far
+faster and cheaper than one cold-started run per domain, and resilient to a
+flaky network (short start→poll→fetch calls, all retried).
+
+Resume: only SUCCESSFUL enrichments (text, no errors) are skipped, so a failed
+or empty domain is retried on the next run (never frozen into cestino E).
+The classifier (30) reads ONLY from this cache.
 
   python src/20_enrich.py [--dry-run] [--force] [--limit N]
 
---dry-run estimates calls + cost without spending. --force re-enriches cached
-domains. Guardrail: aborts if INSTANTLY_API_KEY is present.
+Guardrail: aborts if INSTANTLY_API_KEY is present.
 """
 from __future__ import annotations
 
@@ -20,8 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lib import config
 from lib.budget import BudgetGuard
-from lib.cache import is_enriched, read_cache, write_cache
-from lib.parallel import run_pool
+from lib.cache import is_enriched, write_cache
 from lib.providers import apify
 from lib.runlog import append_stage, merge_errors
 
@@ -52,7 +55,6 @@ def main() -> int:
     budget = BudgetGuard(config.budget_cap_eur())
     token = config.env("APIFY_API")
 
-    # Resume on SUCCESSFUL enrichments only → failed/empty domains get retried.
     todo = [l for l in leads if args.force or not is_enriched(l["dominio"])]
     skipped = len(leads) - len(todo)
 
@@ -72,40 +74,42 @@ def main() -> int:
     affordable = budget.affordable(per_domain)
     truncated = max(0, len(todo) - affordable)
     if truncated:
-        print(f"budget: cap {budget.cap:.2f} EUR → arrivo a {affordable}/{len(todo)} domini ({truncated} rimandati)")
+        print(f"budget: cap {budget.cap:.2f} EUR → {affordable}/{len(todo)} domini ({truncated} rimandati)")
         todo = todo[:affordable]
 
-    def enrich_one(lead: dict) -> dict:
-        domain = lead["dominio"]
-        frag = apify.enrich_domain(token, domain, cfg)
-        errs = frag.get("errors") or []
-        ok = not errs
-        if ok:
-            budget.charge("apify", per_domain)  # thread-safe; only successful runs
-        write_cache(domain, {
-            "domain": domain,
-            "seed": lead.get("seed", {}),
-            "annunci": frag["annunci"],
-            "text": frag["text"],
-            "sources": frag["sources"],
-            "providers": frag.get("providers", []),
-            "errors": errs,
-        })
-        return {"status": "ok" if ok else "err", "domain": domain, "error": errs[0] if errs else ""}
+    seed_by_dom = {l["dominio"]: l.get("seed", {}) for l in todo}
+    domains = [l["dominio"] for l in todo]
+    batch_size = int((cfg.get("providers", {}) or {}).get("apify", {}).get("batch_size", 200))
 
-    workers = int((cfg.get("concurrency", {}) or {}).get("enrich", 6))
-    results = run_pool(todo, enrich_one, workers)
-    enriched = sum(1 for r in results if r["status"] == "ok")
-    errors = sum(1 for r in results if r["status"] == "err")
-    fails = [{"domain": r["domain"], "stage": "enrich", "error": r["error"]} for r in results if r["status"] == "err"]
+    enriched, errors, fails = 0, 0, []
+    for i in range(0, len(domains), batch_size):
+        chunk = domains[i:i + batch_size]
+        try:
+            result = apify.run_batch(token, chunk, cfg)
+        except Exception as e:  # noqa: BLE001 — whole run failed to start; mark chunk, continue
+            msg = str(e).split("?")[0]
+            result = {d: {"annunci": [], "text": "", "sources": [], "providers": [], "errors": [msg]} for d in chunk}
+        print(f"  batch {i // batch_size + 1}: {len(chunk)} domini")
+        for d in chunk:
+            frag = result.get(d, {"annunci": [], "text": "", "sources": [], "providers": [], "errors": ["missing"]})
+            errs = frag.get("errors") or []
+            if errs:
+                errors += 1
+                fails.append({"domain": d, "stage": "enrich", "error": errs[0]})
+            else:
+                budget.charge("apify", per_domain)  # only successful crawls
+                enriched += 1
+            write_cache(d, {"domain": d, "seed": seed_by_dom.get(d, {}), "annunci": frag["annunci"],
+                            "text": frag["text"], "sources": frag["sources"],
+                            "providers": frag.get("providers", []), "errors": errs})
+
     if fails:
         merge_errors("enrich", fails)
-
     append_stage("enrich", {"enriched": enriched, "cached_skip": skipped, "errors": errors,
-                            "budget_truncated": truncated, "workers": workers,
+                            "budget_truncated": truncated, "batch_size": batch_size,
                             "budget_spent_eur": round(budget.spent, 4), "dry_run": False})
-    print(f"enrich: {enriched} enriched, {skipped} cached, {errors} errors, "
-          f"spent {budget.spent:.3f} EUR ({workers} paralleli)")
+    print(f"enrich: {enriched} enriched, {skipped} cached, {errors} errors, spent {budget.spent:.3f} EUR "
+          f"(batch da {batch_size})")
     return 0
 
 
