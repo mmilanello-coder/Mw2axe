@@ -104,7 +104,11 @@ def main() -> int:
                 "provincia": r["state"],
             }
         )
-        manifest.append({"dominio": r["dominio"], "email": email, "seed": seed})
+        manifest.append({
+            "dominio": r["dominio"], "email": email,
+            "first_name": r["first_name"], "last_name": r["last_name"],
+            "company": r["company"], "city": r["city"], "seed": seed,
+        })
 
     inserted = db.insert("leads", lead_rows)
     for lead, man in zip(inserted, manifest):
