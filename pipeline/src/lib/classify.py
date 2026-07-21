@@ -16,9 +16,9 @@ import requests
 
 from .config import PROMPTS, env
 
-DEFAULT_BASE_URL = "https://api.deepseek.com"
-DEFAULT_MODEL = "deepseek-chat"
-DEFAULT_KEY_ENV = "LLM_API_KEY"
+DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_MODEL = "deepseek/deepseek-chat"
+DEFAULT_KEY_ENV = "OPENROUTER_API"
 
 
 def _cfg(cfg: dict) -> dict:

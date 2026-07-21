@@ -39,6 +39,7 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--input", type=str, default="")
+    ap.add_argument("--with-email", action="store_true", help="tieni solo i lead con email")
     args = ap.parse_args()
 
     config.assert_no_instantly()
@@ -60,6 +61,8 @@ def main() -> int:
             excluded += 1
             continue
         kept.append(r)
+    if args.with_email:
+        kept = [r for r in kept if r["email"]]
     if args.limit:
         kept = kept[: args.limit]
 
@@ -79,7 +82,7 @@ def main() -> int:
         email_valid = None
         if not args.dry_run and email:
             budget.charge("millionverifier", millionverifier.cost_per_email_eur(cfg))
-            key = config.env("MILLIONVERIFIER_KEY")
+            key = config.env("MILLIONVERIFIER_API")
             if key:
                 try:
                     email_valid, _ = millionverifier.verify(key, email)

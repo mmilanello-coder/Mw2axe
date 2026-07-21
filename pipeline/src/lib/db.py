@@ -19,10 +19,15 @@ class SupabaseWriter:
         self.url = (env("SUPABASE_URL") or "").rstrip("/")
         self.key = env("SUPABASE_SERVICE_ROLE_KEY") or ""
         self._buffer: dict[str, list[dict]] = {}
-        if not dry_run and not (self.url and self.key):
-            raise SystemExit(
-                "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing — set them or use --dry-run."
-            )
+        # Supabase is OPTIONAL. Without credentials the writer runs in LOCAL mode:
+        # synthetic ids + dump to data/out/db_dryrun.json, no persistence. The CSV
+        # deliverables are produced regardless. Set the two vars to persist.
+        self.local = not (self.url and self.key)
+        if not dry_run and self.local:
+            print("  [db] Supabase non configurato → modalità locale (niente DB, CSV comunque prodotti).")
+
+    def _offline(self) -> bool:
+        return self.dry_run or self.local
 
     def _headers(self) -> dict:
         return {
@@ -36,7 +41,7 @@ class SupabaseWriter:
         """Insert rows; return them WITH ids (synthetic ids in dry-run)."""
         if not rows:
             return []
-        if self.dry_run:
+        if self._offline():
             stamped = [{"id": str(uuid.uuid4()), **r} for r in rows]
             self._buffer.setdefault(table, []).extend(stamped)
             return stamped
@@ -54,7 +59,7 @@ class SupabaseWriter:
         return out[0] if out else {}
 
     def flush_dryrun(self) -> None:
-        if not self.dry_run:
+        if not self._offline():
             return
         DATA_OUT.mkdir(parents=True, exist_ok=True)
         (DATA_OUT / "db_dryrun.json").write_text(
