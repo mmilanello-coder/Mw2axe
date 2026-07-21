@@ -16,6 +16,11 @@ run: ; $(PY) src/10_ingest.py && $(PY) src/20_enrich.py && $(PY) src/30_classify
 # Stima chiamate e costo senza spendere né scrivere su Supabase.
 dry-run: ; $(PY) src/10_ingest.py --dry-run && $(PY) src/20_enrich.py --dry-run && $(PY) src/30_classify.py --dry-run
 
+# Calibrazione: giro REALE su 50 lead con email → misura la spesa vera per
+# provider in data/out/run_log.json (poi si estrapola). Supabase opzionale.
+test50: ; $(PY) src/10_ingest.py --with-email --limit 50 && $(PY) src/20_enrich.py && \
+	$(PY) src/30_classify.py && $(PY) src/40_score.py && $(PY) src/50_qa.py && $(PY) src/60_export.py --skip-qa
+
 # Produce solo cestini + priorità (dopo enrich/classify).
 cestini: ; $(PY) src/40_score.py && $(PY) src/60_export.py $(ARGS)
 

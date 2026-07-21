@@ -29,7 +29,7 @@ def test_provider_config_is_switchable():
 
 
 def test_defaults_when_unconfigured():
-    assert api_key_env({}) == "LLM_API_KEY"
+    assert api_key_env({}) == "OPENROUTER_API"
     assert cost_per_domain_eur({}) == 0.0015
 
 

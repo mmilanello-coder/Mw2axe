@@ -49,7 +49,7 @@ def main() -> int:
 
     per_domain = apify.cost_per_domain_eur(cfg)
     budget = BudgetGuard(config.budget_cap_eur())
-    token = config.env("APIFY_TOKEN")
+    token = config.env("APIFY_API")
 
     todo = [l for l in leads if args.force or not is_cached(l["dominio"])]
     skipped = len(leads) - len(todo)
@@ -63,7 +63,7 @@ def main() -> int:
         return 0
 
     if not token:
-        print("APIFY_TOKEN missing — set it or use --dry-run.")
+        print("APIFY_API missing — set it or use --dry-run.")
         return 1
 
     enriched, errors = 0, 0
